@@ -2,7 +2,7 @@ defmodule DataConvTest do
   use ExUnit.Case
   doctest DataConv
 
-  test "greets the world" do
-    assert DataConv.hello() == :world
+  test "main method should exist" do
+    DataConv.main([])
   end
 end

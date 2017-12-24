@@ -1,18 +1,34 @@
+defmodule MortgageRetention.Recipient do
+
+  defmacro member_id do
+  end
+end
+
+defmodule MortgageRetention.Process do
+end
+
 defmodule DataConv do
-  @moduledoc """
-  Documentation for DataConv.
-  """
 
-  @doc """
-  Hello world.
+  require Logger
+  require CSV
 
-  ## Examples
+  def process(input_path, output_path) do
+    Logger.info "Processing '#{input_path}' to '#{output_path}'"
 
-      iex> DataConv.hello
-      :world
+    stream!(input_path)
+    |> decode
+    |> process_line
+  end
 
-  """
-  def hello do
-    :world
+  defp stream!(file) do
+    File.stream!(file)
+  end
+
+  defp decode(line) do
+    CSV.decode(line, headers: true, separator: ?|)
+  end
+
+  defp process_line(line) do
+    IO.inspect Enum.take(line, 1)
   end
 end
