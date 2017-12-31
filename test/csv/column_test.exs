@@ -8,13 +8,28 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, 123}
     end
 
+    test "'Integer'" do
+      col  = {"Name", [type: "Integer"]}
+      assert Column.input(col, "123") === {:ok, 123}
+    end
+
     test "String" do
       col  = {"Name", [type: String]}
       assert Column.input(col, "123") === {:ok, "123"}
     end
+
+    test "'String'" do
+      col  = {"Name", [type: "String"]}
+      assert Column.input(col, "123") === {:ok, "123"}
+    end
+
+    test "should use first type" do
+      col  = {"Name", [type: String, type: Integer]}
+      assert Column.input(col, "123") === {:ok, "123"}
+    end
   end
 
-  describe "input" do
+  describe "input transform" do
     test "with no transform should return a cell with the value" do
       col  = {"Name", []}
       assert Column.input(col, "foo") === {:ok, "foo"}
@@ -24,11 +39,10 @@ defmodule CSV.ColumnTest do
       col  = {"Name", [transform: &String.upcase/1]}
       assert Column.input(col, "foo") === {:ok, "FOO"}
     end
+  end
 
-    test "should ignore extra options" do
-      col  = {"Name", [transform: &String.upcase/1, foo: "bar"]}
-      assert Column.input(col, "foo") === {:ok, "FOO"}
-    end
-
+  test "should ignore extra options" do
+    col  = {"Name", [transform: &String.upcase/1, foo: "bar"]}
+    assert Column.input(col, "foo") === {:ok, "FOO"}
   end
 end

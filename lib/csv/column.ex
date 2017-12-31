@@ -1,12 +1,12 @@
 defmodule CSV.Column do
   def input({_name, options}, value) do
     {:ok, value, options}
-    |> type
+    |> parse
     |> transform
     |> result
   end
 
-  defp type({:ok, value, options}) do
+  defp parse({:ok, value, options}) do
     if type = options[:type] do
       {:ok, parse(type, value), delete(options, :type)}
     else
@@ -26,21 +26,21 @@ defmodule CSV.Column do
     {status, value}
   end
 
+  defp parse(type, value) when type in [Integer, "Integer"],
+    do: String.to_integer(value)
+
+  defp parse(type, value) when type in [String, "String"],
+    do: value
+
+  defp transform(function, value) when is_function(function) do
+    function.(value)
+  end
+
   defp delete(options, key) do
     Keyword.delete(options, key)
   end
 
   defp delete_first(options, key) do
     Keyword.delete_first(options, key)
-  end
-
-  defp parse(Integer, value),
-    do: String.to_integer(value)
-
-  defp parse(String, value),
-    do: value
-
-  defp transform(f, value) do
-    f.(value)
   end
 end
