@@ -1,7 +1,10 @@
 # The directory Mix will write compiled artifacts to.
 /_build/
 
-# IntelliJ will IDE settings.
+# The "data_conv" escript
+/data_conv
+
+# IntelliJ IDE settings.
 /.idea/
 /*.iml
 
