@@ -47,6 +47,7 @@ defmodule CSV.Column do
     try do
       {:ok, function.(value), options}
     rescue
+      e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)],    options}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)], options}
     end
   end

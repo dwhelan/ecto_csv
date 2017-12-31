@@ -54,6 +54,11 @@ defmodule CSV.ColumnTest do
       col  = {"Name", [transform: &Foo.bar/1]}
       assert Column.input(col, "foo") === {:error, ["function Foo.bar/1 is undefined (module Foo is not available)"]}
     end
+
+    test "with a pattern matching error should return the error message" do
+      col  = {"Name", [transform: &Integer.digits/1]}
+      assert Column.input(col, "foo") === {:error, ["no function clause matching in Integer.digits/2"]}
+    end
   end
 
   test "should ignore extra options" do
