@@ -1,34 +1,76 @@
-defmodule MortgageRetention.Recipient do
 
-  defmacro member_id do
+defmodule Inbox.CSV do
+  defmodule Parser do
+    @callback parse(Stream.t) :: Stream.t
+  end
+  
+  defmodule Formatter do
+    @callback format(stream :: any()) :: any()
   end
 end
 
-defmodule MortgageRetention.Process do
+defmodule Inbox.CSV.RFC4180 do
+  @behaviour Inbox.CSV.Parser
+  @behaviour Inbox.CSV.Formatter
+
+  alias NimbleCSV.RFC4180, as: CSV
+
+  def parse(stream) do
+    CSV.parse_stream(stream, headers: false)
+  end
+
+  def format(stream) do
+    CSV.dump_to_stream(stream)
+  end
 end
 
 defmodule DataConv do
-
   require Logger
-  require CSV
 
   def process(input_path, output_path) do
     Logger.info "Processing '#{input_path}' to '#{output_path}'"
 
-    stream!(input_path)
-    |> decode
-    |> process_line
+    process_stream(File.stream!(input_path), File.stream!(output_path))
   end
 
-  defp stream!(file) do
-    File.stream!(file)
+  def process(input) when is_list(input) do
+    output = []
+    process_stream(input, output)
+    output
   end
 
-  defp decode(line) do
-    CSV.decode(line, headers: true, separator: ?|)
+  def process_stream(input_stream, output_stream) do
+    input_stream
+    |> parse
+    |> Stream.map(fn row -> map_input(row) end )
+    |> Stream.map(fn map -> transform(map) end )
+    |> Stream.map(fn row -> map_output(row) end )
+    |> format
+    |> output(output_stream)
   end
 
-  defp process_line(line) do
-    IO.inspect Enum.take(line, 1)
+  defp parse(stream) do
+    Inbox.CSV.RFC4180.parse(stream)
+  end
+
+  defp map_input(row) do
+    row
+  end
+
+  defp transform(map) do
+    map
+  end
+
+  defp map_output(stream) do
+    stream
+  end
+
+  def format(stream) do
+    Inbox.CSV.RFC4180.format(stream)
+  end
+
+  def output(stream, output_stream) do
+    Enum.into(stream, output_stream)
   end
 end
+

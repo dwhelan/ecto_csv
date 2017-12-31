@@ -1,5 +1,4 @@
 defmodule DataConv.CLI do
-
   require DataConv
 
   def main(args) do
@@ -12,6 +11,6 @@ defmodule DataConv.CLI do
   defp parse([]),                  do: bad_args()
 
   defp bad_args() do
-    IO.puts "Please provide an input and output file: data_conv <input> <output>"
+    raise "Please provide an input and an output file: data_conv <input> <output>"
   end
 end
