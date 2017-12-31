@@ -1,59 +1,59 @@
 defmodule CSV.Column do
   def input({_name, options}, value) do
-    {:ok, value, options}
+    {:ok, options, value}
     |> parse
     |> transform
     |> result
   end
 
-  defp parse({:ok, value, options}) do
+  defp parse({:ok, options, string}) do
     if type = options[:type] do
-      parse(type, value, delete(options, :type))
+      apply_parse(type, delete(options, :type), string)
     else
-      {:ok, value, options}
+      {:ok, options, string}
     end
   end
 
-  defp transform({:ok, value, options}) do
-    if function = options[:transform] do
-      apply_transform(function, value, delete_first(options, :transform))
+  defp transform({:ok, options, value}) do
+    if f = options[:transform] do
+      apply_transform(f, delete_first(options, :transform), value) |> transform
     else
-      {:ok, value, options}
+      {:ok, options, value}
     end
   end
 
-  defp transform({status, error, options}) do
-    {status, error, options}
+  defp transform({:error, options, errors}) do
+    {:error, options, errors}
   end
 
-  defp result{status, value, _options} do
+  defp result{status, _options, value} do
     {status, value}
   end
 
-  defp parse(type, value, options) when type in [String, "String"],
-     do: {:ok, value, options}
+  defp apply_parse(type, options, string) when type in [String, "String"],
+     do: {:ok, options, string}
 
-  defp parse(type, value, options) when type in [Integer, "Integer"] do
-    case Integer.parse(value) do
-      {integer, _} -> {:ok, integer, options}
-      :error       -> {:error, ["'#{value}' is not an Integer"], options}
+  defp apply_parse(type, options, string) when type in [Integer, "Integer"] do
+    case Integer.parse(string) do
+      {integer, _} -> {:ok,    options, integer}
+      :error       -> {:error, options, ["'#{string}' is not an Integer"]}
     end
   end
 
-  defp parse(type, _value, options),
-    do: {:error, ["unknown type '#{type}'"], options}
-    
-  defp apply_transform(f, value, options) do
+  defp apply_parse(type, options, _value),
+    do: {:error, options, ["unknown type '#{type}'"]}
+
+  defp apply_transform(f, options, value) do
     try do
       if is_function(f) do
-        {:ok, f.(value), options}
+        {:ok, options, f.(value)}
       else
         f_atom = if is_atom(f), do: f, else: String.to_atom(f)
-        {:ok, Kernel.apply(String, f_atom, [value]), options}
+        {:ok, options, Kernel.apply(String, f_atom, [value])}
       end
     rescue
-      e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)],    options}
-      e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)], options}
+      e in FunctionClauseError    -> {:error, options, [FunctionClauseError.message(e)]}
+      e in UndefinedFunctionError -> {:error, options, [UndefinedFunctionError.message(e)]}
     end
   end
 
