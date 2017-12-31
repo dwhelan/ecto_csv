@@ -20,7 +20,9 @@ defmodule DataConv.Mixfile do
 
   defp deps do
     [
-      {:csv, "~> 2.0"}
+      {:mix_test_watch, "~> 0.5", only: :dev},
+      {:nimble_csv,     "~> 0.3"},
+      {:timex,          "~> 3.0"},
     ]
   end
 end
