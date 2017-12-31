@@ -23,6 +23,11 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, "123"}
     end
 
+    test "invalid type" do
+      col  = {"Name", [type: "Bad Type"]}
+      assert Column.input(col, "123") === {:error, ["unknown type 'Bad Type'"]}
+    end
+
     test "should use first type" do
       col  = {"Name", [type: String, type: Integer]}
       assert Column.input(col, "123") === {:ok, "123"}
