@@ -42,19 +42,19 @@ defmodule CSV.Column do
 
   defp parse(type, _value, options),
     do: {:error, ["unknown type '#{type}'"], options}
-
-  defp apply_transform(function, value, options) when is_function(function) do
+    
+  defp apply_transform(f, value, options) do
     try do
-      {:ok, function.(value), options}
+      if is_function(f) do
+        {:ok, f.(value), options}
+      else
+        f_atom = if is_atom(f), do: f, else: String.to_atom(f)
+        {:ok, Kernel.apply(String, f_atom, [value]), options}
+      end
     rescue
       e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)],    options}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)], options}
     end
-  end
-
-  defp apply_transform(f, value, options) do
-    f_atom = if is_atom(f), do: f, else: String.to_atom(f)
-    {:ok, Kernel.apply(String, f_atom, [value]), options}
   end
 
   defp delete(options, key) do
