@@ -22,8 +22,8 @@ defmodule CSV.Column do
     end
   end
 
-  defp transform({status, value, options}) do
-    {status, value, options}
+  defp transform({status, error, options}) do
+    {status, error, options}
   end
 
   defp result{status, value, _options} do
@@ -50,6 +50,13 @@ defmodule CSV.Column do
       e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)],    options}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)], options}
     end
+  end
+
+  defp transform(function_atom, value, options) when is_atom(function_atom) do
+  {:ok, Kernel.apply(String, function_atom, [value]), options}
+  end
+
+  defp transform(function_name, value, options) when is_binary(function_name) do
   end
 
   defp delete(options, key) do
