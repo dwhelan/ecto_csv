@@ -28,4 +28,3 @@ defmodule CSV.Schema do
     Map.put(schema, :columns, columns ++ [{name, options}])
   end
 end
-
