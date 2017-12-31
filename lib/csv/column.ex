@@ -16,7 +16,7 @@ defmodule CSV.Column do
 
   defp transform({:ok, value, options}) do
     if function = options[:transform] do
-      transform(function, value, delete_first(options, :transform))
+      apply_transform(function, value, delete_first(options, :transform))
     else
       {:ok, value, options}
     end
@@ -43,7 +43,7 @@ defmodule CSV.Column do
   defp parse(type, _value, options),
     do: {:error, ["unknown type '#{type}'"], options}
 
-  defp transform(function, value, options) when is_function(function) do
+  defp apply_transform(function, value, options) when is_function(function) do
     try do
       {:ok, function.(value), options}
     rescue
@@ -52,11 +52,9 @@ defmodule CSV.Column do
     end
   end
 
-  defp transform(function_atom, value, options) when is_atom(function_atom) do
-  {:ok, Kernel.apply(String, function_atom, [value]), options}
-  end
-
-  defp transform(function_name, value, options) when is_binary(function_name) do
+  defp apply_transform(f, value, options) do
+    f_atom = if is_atom(f), do: f, else: String.to_atom(f)
+    {:ok, Kernel.apply(String, f_atom, [value]), options}
   end
 
   defp delete(options, key) do

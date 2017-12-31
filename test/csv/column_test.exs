@@ -50,8 +50,13 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "foo") === {:ok, "FOO"}
     end
 
-    test "should allow String functions to be specified with an atom" do
+    test "should allow String functions to be specified with an Atom" do
       col  = {"Name", [transform: :upcase]}
+      assert Column.input(col, "foo") === {:ok, "FOO"}
+    end
+
+    test "should allow String functions to be specified with an String" do
+      col  = {"Name", [transform: "upcase"]}
       assert Column.input(col, "foo") === {:ok, "FOO"}
     end
 
