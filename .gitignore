@@ -1,8 +1,9 @@
 # The directory Mix will write compiled artifacts to.
 /_build/
 
-# The directory IntelliJ will save IDE settings.
+# IntelliJ will IDE settings.
 /.idea/
+/*.iml
 
 # If you run "mix test --cover", coverage assets end up here.
 /cover/
