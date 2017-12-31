@@ -15,8 +15,8 @@ defmodule CSV.Column do
   end
 
   defp transform({:ok, value, options}) do
-    if transform = options[:transform] do
-      {:ok, transform(transform, value), delete_first(options, :transform)}
+    if function = options[:transform] do
+      transform(function, value, delete_first(options, :transform))
     else
       {:ok, value, options}
     end
@@ -43,8 +43,12 @@ defmodule CSV.Column do
   defp parse(type, _value, options),
     do: {:error, ["unknown type '#{type}'"], options}
 
-  defp transform(function, value) when is_function(function) do
-    function.(value)
+  defp transform(function, value, options) when is_function(function) do
+    try do
+      {:ok, function.(value), options}
+    rescue
+      e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)], options}
+    end
   end
 
   defp delete(options, key) do

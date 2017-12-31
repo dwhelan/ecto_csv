@@ -45,9 +45,14 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "foo") === {:ok, "foo"}
     end
 
-    test "with a transform should return a cell with the transformed value" do
+    test "should return transformed value" do
       col  = {"Name", [transform: &String.upcase/1]}
       assert Column.input(col, "foo") === {:ok, "FOO"}
+    end
+
+    test "with an invalid function should return the error message" do
+      col  = {"Name", [transform: &Foo.bar/1]}
+      assert Column.input(col, "foo") === {:error, ["function Foo.bar/1 is undefined (module Foo is not available)"]}
     end
   end
 
@@ -56,3 +61,4 @@ defmodule CSV.ColumnTest do
     assert Column.input(col, "foo") === {:ok, "FOO"}
   end
 end
+
