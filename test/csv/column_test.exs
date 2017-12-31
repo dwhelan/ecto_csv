@@ -8,13 +8,13 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, 123}
     end
 
-    test "'Integer'" do
+    test "Integer string" do
       col  = {"Name", [type: "Integer"]}
       assert Column.input(col, "123") === {:ok, 123}
     end
 
     test "bad Integer" do
-      col  = {"Name", [type: "Integer"]}
+      col  = {"Name", [type: Integer]}
       assert Column.input(col, "abc") === {:error, ["'abc' is not an Integer"]}
     end
 
@@ -23,7 +23,7 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, "123"}
     end
 
-    test "'String'" do
+    test "String string" do
       col  = {"Name", [type: "String"]}
       assert Column.input(col, "123") === {:ok, "123"}
     end
@@ -33,7 +33,7 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:error, ["unknown type 'Bad Type'"]}
     end
 
-    test "should use first type" do
+    test "should use first type with multiple types" do
       col  = {"Name", [type: String, type: Integer]}
       assert Column.input(col, "123") === {:ok, "123"}
     end

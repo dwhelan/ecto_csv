@@ -8,7 +8,7 @@ defmodule CSV.Column do
 
   defp parse({:ok, value, options}) do
     if type = options[:type] do
-      _parse(type, value, delete(options, :type))
+      parse(type, value, delete(options, :type))
     else
       {:ok, value, options}
     end
@@ -30,17 +30,17 @@ defmodule CSV.Column do
     {status, value}
   end
 
-  defp _parse(type, value, options) when type in [String, "String"],
+  defp parse(type, value, options) when type in [String, "String"],
      do: {:ok, value, options}
 
-  defp _parse(type, value, options) when type in [Integer, "Integer"] do
+  defp parse(type, value, options) when type in [Integer, "Integer"] do
     case Integer.parse(value) do
       {integer, _} -> {:ok, integer, options}
       :error       -> {:error, ["'#{value}' is not an Integer"], options}
     end
   end
 
-  defp _parse(type, _value, options),
+  defp parse(type, _value, options),
     do: {:error, ["unknown type '#{type}'"], options}
 
   defp transform(function, value) when is_function(function) do
