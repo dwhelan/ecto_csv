@@ -30,11 +30,15 @@ defmodule CSV.Column do
     {status, value}
   end
 
-  defp _parse(type, value, options) when type in [Integer, "Integer"],
-    do: {:ok, String.to_integer(value), options}
-
   defp _parse(type, value, options) when type in [String, "String"],
-    do: {:ok, value, options}
+     do: {:ok, value, options}
+
+  defp _parse(type, value, options) when type in [Integer, "Integer"] do
+    case Integer.parse(value) do
+      {integer, _} -> {:ok, integer, options}
+      :error       -> {:error, ["'#{value}' is not an Integer"], options}
+    end
+  end
 
   defp _parse(type, _value, options),
     do: {:error, ["unknown type '#{type}'"], options}

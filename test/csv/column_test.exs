@@ -13,6 +13,11 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, 123}
     end
 
+    test "bad Integer" do
+      col  = {"Name", [type: "Integer"]}
+      assert Column.input(col, "abc") === {:error, ["'abc' is not an Integer"]}
+    end
+
     test "String" do
       col  = {"Name", [type: String]}
       assert Column.input(col, "123") === {:ok, "123"}
