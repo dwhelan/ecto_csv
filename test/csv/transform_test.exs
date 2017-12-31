@@ -9,7 +9,7 @@ end
 
 defmodule CSV.TransformTest do
   use ExUnit.Case
-  require CSV.Transform, as: Transform
+#  require CSV.Transform, as: Transform
 
 #  test "add_column(schema, name) should add a column with no options"
 
