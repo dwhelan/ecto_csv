@@ -2,6 +2,32 @@ defmodule CSV.ColumnTest do
   use ExUnit.Case
   require CSV.Column, as: Column
 
+  def to_integer(string) do
+    String.to_integer(string)
+  end
+
+  describe "all functions" do
+    test ":integer" do
+      col  = {"Name", :integer}
+      assert Column.input2(col, "123") === {:ok, 123}
+    end
+
+    test "integer string" do
+      col  = {"Name", "integer"}
+      assert Column.input2(col, "123") === {:ok, 123}
+    end
+
+    test "local function" do
+      col  = {"Name", &to_integer/1}
+      assert Column.input2(col, "123") === {:ok, 123}
+    end
+
+    # test ":integer, 16" do
+    #   col  = {"Name", {:integer, base: 16} }
+    #   assert Column.input2(col, "123") === {:ok, 291}
+    # end
+  end
+
   describe "input type" do
     test "Integer" do
       col  = {"Name", [type: Integer]}

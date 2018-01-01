@@ -1,4 +1,46 @@
 defmodule CSV.Column do
+  def integer(string) do
+    String.to_integer(string)
+  end
+
+  def input2({_name, transforms}, value) do
+    transform2(value, List.wrap(transforms))
+  end
+
+  defp transform2(value, transforms) do
+    Enum.reduce(transforms, {:ok, value}, fn(transform, value) -> apply_transform2(transform, value) end)
+  end
+
+  defp apply_transform2(_transform, {:error, errors}) do
+    {:error, errors}
+  end
+
+  defp apply_transform2(transform, {:ok, value}) do
+    try do
+      {:ok, call2(transform, value) }
+    rescue
+      e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)]}
+      e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)]}
+    end
+  end
+
+  defp call2(transform, value) when is_function(transform) do
+    transform.(value)
+  end
+  
+  defp call2(transform, value) do
+    atom = String.to_atom(to_string(transform))
+    Kernel.apply(__MODULE__, atom, [value])
+  end
+  
+  # defp transform2({:ok, transforms, value}) do
+  #   if f = options[:transform] do
+  #     apply_transform(f, delete_first(options, :transform), value) |> transform
+  #   else
+  #     {:ok, options, value}
+  #   end
+  # end
+
   def input({_name, options}, value) do
     {:ok, options, value}
     |> parse
@@ -39,7 +81,7 @@ defmodule CSV.Column do
     end
   end
 
-  @parsers %{Integer => &CSV.Column.parse_integer/1}
+  # @parsers %{Integer => &CSV.Column.parse_integer/1}
 
   defp parse_integer(string) do
     case Integer.parse(string) do
