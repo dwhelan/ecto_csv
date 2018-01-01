@@ -4,9 +4,12 @@
 # The "data_conv" escript
 /data_conv
 
-# IntelliJ IDE settings.
+# IntelliJ IDE files.
 /.idea/
 /*.iml
+
+# Visual Studio Code ElixirLS files.
+/.elixir_ls/
 
 # If you run "mix test --cover", coverage assets end up here.
 /cover/
