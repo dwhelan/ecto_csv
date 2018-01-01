@@ -8,7 +8,8 @@ defmodule CSV.Column do
 
   defp parse({:ok, options, string}) do
     if type = options[:type] do
-      apply_parse(type, delete(options, :type), string)
+      {status, result } =  apply_parse(type, string)
+      {status, delete(options, :type), result}
     else
       {:ok, options, string}
     end
@@ -30,18 +31,26 @@ defmodule CSV.Column do
     {status, value}
   end
 
-  defp apply_parse(type, options, string) when type in [String, "String"],
-     do: {:ok, options, string}
-
-  defp apply_parse(type, options, string) when type in [Integer, "Integer"] do
-    case Integer.parse(string) do
-      {integer, _} -> {:ok,    options, integer}
-      :error       -> {:error, options, ["'#{string}' is not an Integer"]}
+  defp apply_parse(type, string) do
+    cond do
+      is_a?(String,  type) -> {:ok,    string}
+      is_a?(Integer, type) -> parse_integer(string)
+      true                 -> {:error, ["unknown type '#{type}'"]}
     end
   end
 
-  defp apply_parse(type, options, _value),
-    do: {:error, options, ["unknown type '#{type}'"]}
+  @parsers %{Integer => &CSV.Column.parse_integer/1}
+
+  defp parse_integer(string) do
+    case Integer.parse(string) do
+      {integer, _} -> {:ok,    integer}
+      :error       -> {:error, ["'#{string}' is not an Integer"]}
+    end
+  end
+
+  defp is_a?(module, type) do
+    "#{module}" in ["#{type}", "Elixir.#{type}"]
+  end
 
   defp apply_transform(f, options, value) do
     try do

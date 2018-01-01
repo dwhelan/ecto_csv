@@ -8,6 +8,11 @@ defmodule CSV.ColumnTest do
       assert Column.input(col, "123") === {:ok, 123}
     end
 
+    test "Integer atom" do
+      col  = {"Name", [type: :Integer]}
+      assert Column.input(col, "123") === {:ok, 123}
+    end
+
     test "Integer string" do
       col  = {"Name", [type: "Integer"]}
       assert Column.input(col, "123") === {:ok, 123}
