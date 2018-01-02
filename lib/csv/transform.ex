@@ -1,5 +1,4 @@
-defmodule CSV.Column do
-
+defmodule CSV.Transform do
   require CSV.Invoke, as: Invoke
 
   def transform(value, transforms, options \\ %{}) do
