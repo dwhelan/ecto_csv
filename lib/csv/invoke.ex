@@ -1,28 +1,28 @@
 defmodule CSV.Invoke do
 
-  def call(_modules, f, value) when is_function(f) do
+  def apply(_modules, f, value) when is_function(f) do
     f.(value)
   end
 
-  def call(module, function, args) when is_binary(module) or is_atom(module) do
-    do_call(module, function, args)
+  def apply(module, function, args) when is_binary(module) or is_atom(module) do
+    do_apply(module, function, args)
   end
 
-  def call(modules, function, args) do
+  def apply(modules, function, args) do
     if length(modules) == 1 do
-      do_call(hd(modules), function, args)
+      do_apply(hd(modules), function, args)
     else
       parts = Regex.split(~r/\./, to_string(function))
 
       if module_specified?(parts) do
-        do_call(module_from(parts), function_from(parts), args)
+        do_apply(module_from(parts), function_from(parts), args)
       else
-        do_call(find_module(function, modules), function, args)
+        do_apply(find_module(function, modules), function, args)
       end
     end
   end
 
-  defp do_call(module, function, args) do
+  defp do_apply(module, function, args) do
     Kernel.apply(to_module_atom(module), to_atom(function), List.wrap(args))
   end
 
