@@ -10,7 +10,7 @@ defmodule CSV.TransformTest do
     Integer.to_string(value)
   end
 
-  describe "transform module" do
+  describe "module" do
     test "as a Module" do
       to_int = {CSV.TransformTest, :to_int}
       assert Transform.transform("123", to_int) === {:ok, 123}
@@ -43,7 +43,7 @@ defmodule CSV.TransformTest do
     end
   end
 
-  describe "transform function" do
+  describe "function" do
     test "as a String with module" do
       to_int = {CSV.TransformTest, "to_int"}
       assert Transform.transform("123", to_int) === {:ok, 123}
@@ -73,6 +73,9 @@ defmodule CSV.TransformTest do
       to_int = &(String.to_integer(&1))
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
+  end
+
+  describe "args" do
   end
 
   defmodule ErrorWithoutMessage do
