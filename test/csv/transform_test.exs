@@ -72,6 +72,10 @@ defmodule CSV.ColumnTest do
   end
 
   describe "error handing" do
+    test "with undefined function" do
+      assert Transform.transform("123", :undefined_function) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
+    end
+
     test "with error raised by function" do
       to_int = &(raise "error in to_int(#{&1})")
       assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
