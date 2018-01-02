@@ -13,6 +13,7 @@ defmodule CSV.Transform do
     try do
       {:ok, Invoke.call(transform, value, options[:modules] || []) }
     rescue
+      e in RuntimeError           -> {:error, [RuntimeError.message(e)]}
       e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)]}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)]}
     end
