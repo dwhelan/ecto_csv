@@ -1,51 +1,64 @@
 defmodule CSV.Column do
 
   defmodule Invoke do
-    def call(f, value) when is_function(f) do
+
+    def call(function, value, modules \\ [])
+
+    def call(f, value, _modules) when is_function(f) do
       f.(value)
     end
 
-    def call({module, function}, value) do
-      call(module, function, value)
+    def call({module, function}, value, _modules) do
+      do_call(module, function, value)
     end
-  
-    def call(function, value) do
-      parts = Regex.split(~r/\./, to_string(function))
-      module = Module.concat(List.delete_at(parts, -1))
-      function = List.last(parts)
-      call(module, function, value)
+
+    def call(function, value, modules) when is_binary(function) or is_atom(function) do
+      function_parts = Regex.split(~r/\./, to_string(function))
+
+      if length(function_parts) === 1 do
+        module = find_module(function, modules)
+        do_call(module, function, value)
+      else
+        module = Module.concat(List.delete_at(function_parts, -1))
+        function = List.last(function_parts)
+        do_call(module, function, value)
+      end
     end
-  
-    def call(module, function, value) do
+
+    defp do_call(module, function, value) do
       Kernel.apply(to_module_atom(module), to_atom(function), [value])
+    end
+
+    defp find_module(function, modules) do
+      Enum.find(List.wrap(modules), fn module -> :erlang.function_exported(module, function, 1) end) 
     end
 
     defp to_atom(val) do
       String.to_atom(to_string(val))
     end
 
-    defp to_module_atom(val) do
-      Module.concat([val])
+    defp to_module_atom(module) do
+      Module.concat([module])
     end
   end
 
-  def input2({_name, transforms}, value) do
-    transform2(value, List.wrap(transforms))
+  def input2({_name, transforms}, value, options \\ %{}) do
+    transform2(value, List.wrap(transforms), options)
   end
 
-  defp transform2(value, transforms) do
-    Enum.reduce(transforms, {:ok, value}, fn(transform, value) -> apply_transform2(transform, value) end)
+  defp transform2(value, transforms, options) do
+    Enum.reduce(transforms, {:ok, value}, fn(transform, value) -> apply_transform2(transform, value, options) end)
   end
 
-  defp apply_transform2(_transform, {:error, errors}) do
+  defp apply_transform2(_transform, {:error, errors}, _options) do
     {:error, errors}
   end
 
-  defp apply_transform2(transform, {:ok, value}) do
+  defp apply_transform2(transform, {:ok, value}, options) do
     try do
-      {:ok, Invoke.call(transform, value) }
+      {:ok, Invoke.call(transform, value, options[:modules] || []) }
     rescue
-      e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)]}
+      # e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)]}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)]}
     end
   end

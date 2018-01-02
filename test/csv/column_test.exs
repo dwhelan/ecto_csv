@@ -53,6 +53,26 @@ defmodule CSV.ColumnTest do
       col = {"Name", {:"CSV.ColumnTest", :integer} }
       assert Column.input2(col, "123") === {:ok, 123}
     end
+
+    test "as the first module in options[:modules]" do
+      col = {"Name", :integer }
+      assert Column.input2(col, "123", modules: [CSV.ColumnTest, String]) === {:ok, 123}
+    end
+
+    test "as the last module in options[:modules]" do
+      col = {"Name", :integer }
+      assert Column.input2(col, "123", modules: [String, CSV.ColumnTest]) === {:ok, 123}
+    end
+
+    test "as the only module in options[:modules]" do
+      col = {"Name", :integer }
+      assert Column.input2(col, "123", modules: [CSV.ColumnTest]) === {:ok, 123}
+    end
+
+    test "as the options[:modules]" do
+      col = {"Name", :integer }
+      assert Column.input2(col, "123", modules: CSV.ColumnTest) === {:ok, 123}
+    end
   end
 
   describe "input type" do
