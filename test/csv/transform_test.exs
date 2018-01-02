@@ -12,18 +12,15 @@ defmodule CSV.TransformTest do
 
   describe "module" do
     test "as a Module" do
-      to_int = {CSV.TransformTest, :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", {CSV.TransformTest, :to_int}) === {:ok, 123}
     end
 
     test "as a String" do
-      to_int = {"CSV.TransformTest", :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", {"CSV.TransformTest", :to_int}) === {:ok, 123}
     end
 
     test "as an Atom" do
-      to_int = {:"CSV.TransformTest", :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", {:"CSV.TransformTest", :to_int}) === {:ok, 123}
     end
 
     test "as the first module in options[:module]" do
@@ -50,28 +47,23 @@ defmodule CSV.TransformTest do
     end
 
     test "as an Atom with module" do
-      to_int = {CSV.TransformTest, :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", {CSV.TransformTest, :to_int}) === {:ok, 123}
     end
 
     test "as a String that includes module name" do
-      to_int = "CSV.TransformTest.to_int"
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", "CSV.TransformTest.to_int") === {:ok, 123}
     end
 
     test "as an Atom that includes module name" do
-      to_int = :"CSV.TransformTest.to_int"
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", :"CSV.TransformTest.to_int") === {:ok, 123}
     end
 
     test "as a lambda to a named function" do
-      to_int = &to_int/1
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", &to_int/1) === {:ok, 123}
     end
 
     test "as a lambda to an anonymous function" do
-      to_int = &(String.to_integer(&1))
-      assert Transform.transform("123", to_int) === {:ok, 123}
+      assert Transform.transform("123", &(String.to_integer(&1))) === {:ok, 123}
     end
   end
 
