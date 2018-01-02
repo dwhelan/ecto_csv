@@ -6,22 +6,22 @@ defmodule CSV.Invoke do
     f.(value)
   end
 
-  def call({module, function}, value, _modules) do
-    do_call(module, function, value)
+  def call({module, function}, args, _modules) do
+    do_call(module, function, args)
   end
 
-  def call(function, value, modules) do
+  def call(function, args, modules) do
     parts = Regex.split(~r/\./, to_string(function))
 
     if module_specified?(parts) do
-      do_call(module_from(parts), function_from(parts), value)
+      do_call(module_from(parts), function_from(parts), args)
     else
-      do_call(find_module(function, modules), function, value)
+      do_call(find_module(function, modules), function, args)
     end
   end
 
-  defp do_call(module, function, value) do
-    Kernel.apply(to_module_atom(module), to_atom(function), [value])
+  defp do_call(module, function, args) do
+    Kernel.apply(to_module_atom(module), to_atom(function), List.wrap(args))
   end
 
   defp module_specified?(function_parts) do
