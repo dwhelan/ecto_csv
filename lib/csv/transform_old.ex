@@ -1,4 +1,4 @@
-defmodule CSV.Transform do
+defmodule CSV.TransformOld do
   defmacro __using__(_name) do
     quote do
       import unquote(__MODULE__)

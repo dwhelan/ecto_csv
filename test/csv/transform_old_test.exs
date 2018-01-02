@@ -1,5 +1,5 @@
 defmodule CSV.TransformMacroTest do
-  use CSV.Transform
+  use CSV.TransformOld
 
   use ExUnit.Case
 
