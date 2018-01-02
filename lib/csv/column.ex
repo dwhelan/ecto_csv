@@ -1,6 +1,32 @@
 defmodule CSV.Column do
-  def integer(string) do
-    String.to_integer(string)
+
+  defmodule Invoke do
+    def call(f, value) when is_function(f) do
+      f.(value)
+    end
+
+    def call({module, function}, value) do
+      call(module, function, value)
+    end
+  
+    def call(function, value) do
+      parts = Regex.split(~r/\./, to_string(function))
+      module = Module.concat(List.delete_at(parts, -1))
+      function = List.last(parts)
+      call(module, function, value)
+    end
+  
+    def call(module, function, value) do
+      Kernel.apply(to_module_atom(module), to_atom(function), [value])
+    end
+
+    defp to_atom(val) do
+      String.to_atom(to_string(val))
+    end
+
+    defp to_module_atom(val) do
+      Module.concat([val])
+    end
   end
 
   def input2({_name, transforms}, value) do
@@ -17,29 +43,12 @@ defmodule CSV.Column do
 
   defp apply_transform2(transform, {:ok, value}) do
     try do
-      {:ok, call2(transform, value) }
+      {:ok, Invoke.call(transform, value) }
     rescue
       e in FunctionClauseError    -> {:error, [FunctionClauseError.message(e)]}
       e in UndefinedFunctionError -> {:error, [UndefinedFunctionError.message(e)]}
     end
   end
-
-  defp call2(transform, value) when is_function(transform) do
-    transform.(value)
-  end
-  
-  defp call2(transform, value) do
-    atom = String.to_atom(to_string(transform))
-    Kernel.apply(__MODULE__, atom, [value])
-  end
-  
-  # defp transform2({:ok, transforms, value}) do
-  #   if f = options[:transform] do
-  #     apply_transform(f, delete_first(options, :transform), value) |> transform
-  #   else
-  #     {:ok, options, value}
-  #   end
-  # end
 
   def input({_name, options}, value) do
     {:ok, options, value}
