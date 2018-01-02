@@ -74,7 +74,7 @@ defmodule CSV.ColumnTest do
   describe "error handing" do
     test "with error raised by function" do
       to_int = &(raise "error in to_int(#{&1})")
-      assert Transform.transform("123", to_int) === {:error, ["error in to_int(123)"]}
+      assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
     end
   end
 
