@@ -58,20 +58,20 @@ defmodule CSV.ColumnTest do
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
 
-    test "as the first module in options[:modules]" do
-      assert Transform.transform("123", :to_int, modules: [CSV.ColumnTest, String]) === {:ok, 123}
+    test "as the first module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [CSV.ColumnTest, String]) === {:ok, 123}
     end
 
-    test "as the last module in options[:modules]" do
-      assert Transform.transform("123", :to_int, modules: [String, CSV.ColumnTest]) === {:ok, 123}
+    test "as the last module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [String, CSV.ColumnTest]) === {:ok, 123}
     end
 
-    test "as the only module in options[:modules]" do
-      assert Transform.transform("123", :to_int, modules: [CSV.ColumnTest]) === {:ok, 123}
+    test "as the only module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [CSV.ColumnTest]) === {:ok, 123}
     end
 
-    test "as the options[:modules]" do
-      assert Transform.transform("123", :to_int, modules: CSV.ColumnTest) === {:ok, 123}
+    test "as the options[:module]" do
+      assert Transform.transform("123", :to_int, module: CSV.ColumnTest) === {:ok, 123}
     end
   end
 
@@ -89,7 +89,7 @@ defmodule CSV.ColumnTest do
     end
 
     test "with function clause error" do
-      assert Transform.transform("123", :int_to_string, modules: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
+      assert Transform.transform("123", :int_to_string, module: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
     end
 
     test "with error raised by function" do

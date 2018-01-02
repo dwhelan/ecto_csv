@@ -11,7 +11,7 @@ defmodule CSV.Transform do
 
   defp transform_one(transform, {:ok, value}, options) do
     try do
-      {:ok, Invoke.call(transform, value, options[:modules] || []) }
+      {:ok, Invoke.call(transform, value, options[:module] || []) }
     rescue 
       e -> handle_error(e)
     catch
