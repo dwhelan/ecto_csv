@@ -69,14 +69,6 @@ defmodule CSV.TransformTest do
   describe "args" do
   end
 
-  defmodule ErrorWithoutMessage do
-    defexception [:value]
-
-    def message(_) do
-      raise UndefinedFunctionError
-    end
-  end
-
   describe "error handing" do
     test "with undefined function" do
       assert Transform.transform("123", :undefined_function) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
@@ -96,13 +88,35 @@ defmodule CSV.TransformTest do
       assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
     end
 
+    defmodule ErrorWithoutMessage do
+      defexception [:value]
+  
+      def message(_) do
+        raise UndefinedFunctionError
+      end
+    end
+  
     test "with error without message() function" do
       to_int = &(raise CSV.TransformTest.ErrorWithoutMessage, value: &1)
       assert Transform.transform("123", to_int) === {:error, "%CSV.TransformTest.ErrorWithoutMessage{value: \"123\"}"}
     end
   end
 
-  test "should ignore extra options" do
-    assert Transform.transform("123", &to_int/1, foo: "bar") === {:ok, 123}
+  describe "special argument handling" do
+    test "should return value if transforms is empty" do
+      assert Transform.transform("123", []) === {:ok, "123"}
+    end
+
+    test "should return value if transforms is nil" do
+      assert Transform.transform("123", nil) === {:ok, "123"}
+    end
+
+    test "should return value if transforms is not specified" do
+      assert Transform.transform("123") === {:ok, "123"}
+    end
+
+    test "should ignore extra options" do
+      assert Transform.transform("123", &to_int/1, foo: "bar") === {:ok, 123}
+    end
   end
 end

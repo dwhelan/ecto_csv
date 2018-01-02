@@ -1,4 +1,19 @@
 defmodule CSV.Invoke do
+  @doc """
+  Invokes the given `fun` with the list of arguments `args`.
+
+  Inlined by the compiler.
+
+  ## Examples
+
+      iex> apply(fn x -> x * 2 end, [2])
+      4
+
+  """
+  @spec apply(fun, [any]) :: any
+  def apply(fun, args) when is_function(fun) do
+    Kernel.apply(fun, args)
+  end
 
   def apply(module, f_name, args) when is_binary(module) or is_atom(module) do
     do_apply(module, f_name, args)
