@@ -2,30 +2,29 @@ defmodule CSV.Transform do
   require CSV.Invoke, as: Invoke
 
   def transform(value, transforms, options \\ %{}) do
-    Enum.reduce(List.wrap(transforms), {:ok, value}, fn(transform, value) -> transform_one(transform, value, options) end)
-  end
-
-  defp transform_one(_, {:error, errors}, _) do
-    {:error, errors}
-  end
-
-  defp transform_one({module, f_name}, {:ok, value}, _options) do
-    invoke(module, f_name, value)
-  end
-
-  defp transform_one(f_name, {:ok, value}, options) do
-    modules = options[:module] || []
-    invoke(modules, f_name, value)
-  end
-
-  defp invoke(module, f_name, value) do
     try do
-      {:ok, Invoke.apply(module, f_name, value) }
+      Enum.reduce(List.wrap(transforms), {:ok, value}, fn(transform, value) -> transform_one(transform, value, options) end)
     rescue 
       e -> handle_error(e)
     catch
       e -> handle_error(e)
     end
+  end
+
+  defp transform_one({module, function}, {:ok, value}, _options) do
+    invoke(module, function, value)
+  end
+
+  defp transform_one(function, {:ok, value}, options) do
+    invoke(List.wrap(options[:module]), function, value)
+  end
+
+  defp invoke(_module, f, value) when is_function(f) do
+    {:ok, f.(value)}
+  end
+
+  defp invoke(module, f_name, value) do
+    {:ok, Invoke.apply(module, f_name, [value])}
   end
 
   defp handle_error(e) do

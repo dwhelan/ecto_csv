@@ -1,9 +1,5 @@
 defmodule CSV.Invoke do
 
-  def apply(_modules, f, value) when is_function(f) do
-    f.(value)
-  end
-
   def apply(module, f_name, args) when is_binary(module) or is_atom(module) do
     do_apply(module, f_name, args)
   end
@@ -23,7 +19,7 @@ defmodule CSV.Invoke do
   end
 
   defp do_apply(module, f_name, args) do
-    Kernel.apply(to_module_atom(module), to_atom(f_name), List.wrap(args))
+    Kernel.apply(to_module_atom(module), to_atom(f_name), args)
   end
 
   defp module_specified?(function_parts) do
