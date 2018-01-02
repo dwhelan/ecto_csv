@@ -1,4 +1,4 @@
-defmodule CSV.ColumnTest do
+defmodule CSV.TransformTest do
   use ExUnit.Case
   require CSV.Transform, as: Transform
 
@@ -10,24 +10,57 @@ defmodule CSV.ColumnTest do
     Integer.to_string(value)
   end
 
+  describe "transform module" do
+    test "as a Module" do
+      to_int = {CSV.TransformTest, :to_int}
+      assert Transform.transform("123", to_int) === {:ok, 123}
+    end
+
+    test "as a String" do
+      to_int = {"CSV.TransformTest", :to_int}
+      assert Transform.transform("123", to_int) === {:ok, 123}
+    end
+
+    test "as an Atom" do
+      to_int = {:"CSV.TransformTest", :to_int}
+      assert Transform.transform("123", to_int) === {:ok, 123}
+    end
+
+    test "as the first module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [CSV.TransformTest, String]) === {:ok, 123}
+    end
+
+    test "as the last module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [String, CSV.TransformTest]) === {:ok, 123}
+    end
+
+    test "as the only module in options[:module]" do
+      assert Transform.transform("123", :to_int, module: [CSV.TransformTest]) === {:ok, 123}
+    end
+
+    test "as the options[:module]" do
+      assert Transform.transform("123", :to_int, module: CSV.TransformTest) === {:ok, 123}
+    end
+  end
+
   describe "transform function" do
     test "as a String with module" do
-      to_int = {CSV.ColumnTest, "to_int"}
+      to_int = {CSV.TransformTest, "to_int"}
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
 
     test "as an Atom with module" do
-      to_int = {CSV.ColumnTest, :to_int}
+      to_int = {CSV.TransformTest, :to_int}
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
 
     test "as a String that includes module name" do
-      to_int = "CSV.ColumnTest.to_int"
+      to_int = "CSV.TransformTest.to_int"
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
 
     test "as an Atom that includes module name" do
-      to_int = :"CSV.ColumnTest.to_int"
+      to_int = :"CSV.TransformTest.to_int"
       assert Transform.transform("123", to_int) === {:ok, 123}
     end
 
@@ -42,40 +75,7 @@ defmodule CSV.ColumnTest do
     end
   end
 
-  describe "transform module" do
-    test "as a Module" do
-      to_int = {CSV.ColumnTest, :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
-    end
-
-    test "as a String" do
-      to_int = {"CSV.ColumnTest", :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
-    end
-
-    test "as an Atom" do
-      to_int = {:"CSV.ColumnTest", :to_int}
-      assert Transform.transform("123", to_int) === {:ok, 123}
-    end
-
-    test "as the first module in options[:module]" do
-      assert Transform.transform("123", :to_int, module: [CSV.ColumnTest, String]) === {:ok, 123}
-    end
-
-    test "as the last module in options[:module]" do
-      assert Transform.transform("123", :to_int, module: [String, CSV.ColumnTest]) === {:ok, 123}
-    end
-
-    test "as the only module in options[:module]" do
-      assert Transform.transform("123", :to_int, module: [CSV.ColumnTest]) === {:ok, 123}
-    end
-
-    test "as the options[:module]" do
-      assert Transform.transform("123", :to_int, module: CSV.ColumnTest) === {:ok, 123}
-    end
-  end
-
-  defmodule Error do
+  defmodule ErrorWithoutMessage do
     defexception [:value]
 
     def message(_) do
@@ -89,7 +89,7 @@ defmodule CSV.ColumnTest do
     end
 
     test "with function clause error" do
-      assert Transform.transform("123", :int_to_string, module: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
+      assert Transform.transform("123", :int_to_string, module: CSV.TransformTest) === {:error, "no function clause matching in CSV.TransformTest.int_to_string/1"}
     end
 
     test "with error raised by function" do
@@ -103,8 +103,8 @@ defmodule CSV.ColumnTest do
     end
 
     test "with error without message() function" do
-      to_int = &(raise CSV.ColumnTest.Error, value: &1)
-      assert Transform.transform("123", to_int) === {:error, "%CSV.ColumnTest.Error{value: \"123\"}"}
+      to_int = &(raise CSV.TransformTest.ErrorWithoutMessage, value: &1)
+      assert Transform.transform("123", to_int) === {:error, "%CSV.TransformTest.ErrorWithoutMessage{value: \"123\"}"}
     end
   end
 
