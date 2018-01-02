@@ -75,6 +75,14 @@ defmodule CSV.ColumnTest do
     end
   end
 
+  defmodule Error do
+    defexception [:value]
+
+    def message(_) do
+      raise UndefinedFunctionError
+    end
+  end
+
   describe "error handing" do
     test "with undefined function" do
       assert Transform.transform("123", :undefined_function) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
@@ -84,14 +92,19 @@ defmodule CSV.ColumnTest do
       assert Transform.transform("123", :int_to_string, modules: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
     end
 
-    test "with runtime error raised by function" do
+    test "with error raised by function" do
       to_int = &(raise "error in to_int(#{&1})")
       assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
     end
 
-    test "with runtime error thrown by function" do
+    test "with error thrown by function" do
       to_int = &(throw "error in to_int(#{&1})")
       assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
+    end
+
+    test "with error without message() function" do
+      to_int = &(raise CSV.ColumnTest.Error, value: &1)
+      assert Transform.transform("123", to_int) === {:error, "%CSV.ColumnTest.Error{value: \"123\"}"}
     end
   end
 

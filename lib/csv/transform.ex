@@ -19,11 +19,19 @@ defmodule CSV.Transform do
     end
   end
 
-  defp handle_error(e) when is_binary(e) do
-    {:error, e}
+  defp handle_error(e) do
+    {:error, error_message(e)}
   end
 
-  defp handle_error(e) when is_map(e) do
-    {:error, e.__struct__.message(e)}
+  defp error_message(string) when is_binary(string) do
+    string
+  end
+
+  defp error_message(e) do
+    try do
+      e.__struct__.message(e)
+    rescue
+      UndefinedFunctionError -> inspect(e)
+    end 
   end
 end
