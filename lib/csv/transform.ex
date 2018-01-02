@@ -12,10 +12,18 @@ defmodule CSV.Transform do
   defp transform_one(transform, {:ok, value}, options) do
     try do
       {:ok, Invoke.call(transform, value, options[:modules] || []) }
-    rescue
-      e in RuntimeError           -> {:error, RuntimeError.message(e)}
-      e in FunctionClauseError    -> {:error, FunctionClauseError.message(e)}
-      e in UndefinedFunctionError -> {:error, UndefinedFunctionError.message(e)}
+    rescue 
+      e -> handle_error(e)
+    catch
+      e -> handle_error(e)
     end
+  end
+
+  defp handle_error(e) when is_binary(e) do
+    {:error, e}
+  end
+
+  defp handle_error(e) when is_map(e) do
+    {:error, e.__struct__.message(e)}
   end
 end

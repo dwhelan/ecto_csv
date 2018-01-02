@@ -84,13 +84,13 @@ defmodule CSV.ColumnTest do
       assert Transform.transform("123", :int_to_string, modules: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
     end
 
-    # test "with function clause error" do
-    #   to_int = &(&1 <> &2)
-    #   assert Transform.transform("123", to_int) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
-    # end
-
-    test "with error raised by function" do
+    test "with runtime error raised by function" do
       to_int = &(raise "error in to_int(#{&1})")
+      assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
+    end
+
+    test "with runtime error thrown by function" do
+      to_int = &(throw "error in to_int(#{&1})")
       assert Transform.transform("123", to_int) === {:error, "error in to_int(123)"}
     end
   end
