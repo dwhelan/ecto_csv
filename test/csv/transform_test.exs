@@ -41,12 +41,11 @@ defmodule CSV.TransformTest do
   end
 
   describe "function" do
-    test "as a String with module" do
-      to_int = {CSV.TransformTest, "to_int"}
-      assert Transform.transform("123", to_int) === {:ok, 123}
+    test "as a String" do
+      assert Transform.transform("123", {CSV.TransformTest, "to_int"}) === {:ok, 123}
     end
 
-    test "as an Atom with module" do
+    test "as an Atom" do
       assert Transform.transform("123", {CSV.TransformTest, :to_int}) === {:ok, 123}
     end
 
