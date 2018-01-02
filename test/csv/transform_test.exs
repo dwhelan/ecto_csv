@@ -6,6 +6,10 @@ defmodule CSV.ColumnTest do
     String.to_integer(string)
   end
 
+  def int_to_string(value) when is_integer(value) do
+    Integer.to_string(value)
+  end
+
   describe "transform function" do
     test "as a String with module" do
       to_int = {CSV.ColumnTest, "to_int"}
@@ -75,6 +79,15 @@ defmodule CSV.ColumnTest do
     test "with undefined function" do
       assert Transform.transform("123", :undefined_function) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
     end
+
+    test "with function clause error" do
+      assert Transform.transform("123", :int_to_string, modules: CSV.ColumnTest) === {:error, "no function clause matching in CSV.ColumnTest.int_to_string/1"}
+    end
+
+    # test "with function clause error" do
+    #   to_int = &(&1 <> &2)
+    #   assert Transform.transform("123", to_int) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
+    # end
 
     test "with error raised by function" do
       to_int = &(raise "error in to_int(#{&1})")
