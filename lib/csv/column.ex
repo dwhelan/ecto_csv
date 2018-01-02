@@ -2,7 +2,7 @@ defmodule CSV.Column do
 
   require CSV.Invoke, as: Invoke
 
-  def transform(transforms, value, options \\ %{}) do
+  def transform(value, transforms, options \\ %{}) do
     Enum.reduce(List.wrap(transforms), {:ok, value}, fn(transform, value) -> apply_transform(transform, value, options) end)
   end
 
