@@ -19,21 +19,13 @@ defmodule CSV.Invoke do
 
   @spec apply(fun, [any]) :: any
   def apply(fun, args) do
-    :erlang.apply(fun, args)
+    Kernel.apply(fun, args)
   end
 
-  def apply(modules, f_name, args) when is_list(modules) do
-    if length(modules) == 1 do
-      apply(hd(modules), f_name, args)
-    else
-      parts = Regex.split(~r/\./, to_string(f_name))
-
-      if module_specified?(parts) do
-        do_apply(module_from(parts), function_from(parts), args)
-      else
-        do_apply(find_module(f_name, modules), f_name, args)
-      end
-    end
+  @spec apply(list, fun, [any]) :: any
+  def apply(modules, fun, args) when is_list(modules) do
+    {module, function} = extract_module_and_function(fun)
+    apply(module || find_module(function, modules), function, args)
   end
 
   def apply(module, fun, args) do
@@ -42,13 +34,13 @@ defmodule CSV.Invoke do
 
   defp apply_with_inferred_module(fun, args) do
     {module, function} = extract_module_and_function(fun)
-    :erlang.apply(module, function, args)
+    apply(module || Kernel, function, args)
   end
 
   defp extract_module_and_function(fun) do
     case Regex.named_captures(~r/(?<module>^.*)\.(?<function>[^\.]*)$/, to_string(fun)) do
-      m when is_map(m) -> { alias_for(m["module"]), atom(m["function"])}
-      nil              -> { Kernel, atom(fun) }
+      m when is_map(m) -> { m["module"], m["function"]}
+      nil              -> { nil, fun }
     end
   end
 
@@ -57,51 +49,18 @@ defmodule CSV.Invoke do
   end
 
   defp atom(string) do
-    try do
-      String.to_existing_atom(string)
-    rescue
-      _ -> String.to_atom(string)
+    try do String.to_existing_atom(string)
+    rescue _ -> String.to_atom(string)
     end
   end
-
 
   defp alias_for(module) do
-    try do
-      Module.safe_concat([module])
-    rescue
-      _ -> Module.concat([module])
+    try do Module.safe_concat([module])
+    rescue _ -> Module.concat([module])
     end
-  end
-
-  ################
-
-
-
-  defp do_apply(module, f_name, args) do
-    Kernel.apply(to_module_atom(module), to_atom(f_name), args)
-  end
-
-  defp module_specified?(function_parts) do
-    length(function_parts) > 1
-  end
-
-  defp module_from(parts) do
-    Module.concat(List.delete_at(parts, -1))
-  end
-
-  defp function_from(parts) do
-    List.last(parts)
   end
 
   defp find_module(f_name, modules) do
-    Enum.find(List.wrap(modules), fn module -> :erlang.function_exported(module, f_name, 1) end) 
-  end
-
-  defp to_atom(value) do
-    String.to_atom(to_string(value))
-  end
-
-  defp to_module_atom(module) do
-    Module.concat([module])
+    Enum.find(List.wrap(modules), fn module -> :erlang.function_exported(alias_for(module), atom(f_name), 1) end) 
   end
 end
