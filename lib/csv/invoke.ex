@@ -1,4 +1,6 @@
 defmodule CSV.Invoke do
+  import Kernel, except: [apply: 3]
+
   @doc """
   Invokes the given `fun` with the list of arguments `args`.
 
@@ -10,9 +12,49 @@ defmodule CSV.Invoke do
       4
 
   """
+  @spec apply(atom, [any]) :: any
+  def apply(fun, args) when is_atom(fun) do
+    fun_string = to_string(fun)
+    if mod_specified?(fun_string) do
+      parts = Regex.split(~r/\./, fun_string)
+      do_apply(module_from(parts), function_from(parts), args)
+    else
+      :erlang.apply(Kernel, fun, args)
+    end
+  end
+
+  @spec apply(binary, [any]) :: any
+  def apply(fun_string, args) when is_binary(fun_string) do
+    if mod_specified?(fun_string) do
+      parts = Regex.split(~r/\./, fun_string)
+      do_apply(module_from(parts), function_from(parts), args)
+    else
+      :erlang.apply(Kernel, String.to_atom(fun_string), args)
+    end
+  end
+
+  defp mod_specified?(fun) do
+    String.contains?(fun, ".")
+  end
+
   @spec apply(fun, [any]) :: any
-  def apply(fun, args) when is_function(fun) do
-    Kernel.apply(fun, args)
+  def apply(fun, args) do
+    :erlang.apply(fun, args)
+  end
+
+  defp do_apply(fun, args) do
+    fun_string = to_string(fun);
+    if String.contains?(to_string(fun_string), ".") do
+      parts = Regex.split(~r/\./, fun_string)
+      do_apply(module_from(parts), function_from(parts), args)
+    else
+      :erlang.apply(Kernel, to_atom(fun), args)
+    end
+  end
+
+
+  def apply(module, fun, args) when is_atom(module) and is_atom(fun) do
+    :erlang.apply(module, fun, args)
   end
 
   def apply(module, f_name, args) when is_binary(module) or is_atom(module) do
