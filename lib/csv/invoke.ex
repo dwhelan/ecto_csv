@@ -12,29 +12,9 @@ defmodule CSV.Invoke do
       4
 
   """
-  @spec apply(atom, [any]) :: any
-  def apply(fun, args) when is_atom(fun) do
-    fun_string = to_string(fun)
-    if mod_specified?(fun_string) do
-      parts = Regex.split(~r/\./, fun_string)
-      do_apply(module_from(parts), function_from(parts), args)
-    else
-      :erlang.apply(Kernel, fun, args)
-    end
-  end
-
-  @spec apply(binary, [any]) :: any
-  def apply(fun_string, args) when is_binary(fun_string) do
-    if mod_specified?(fun_string) do
-      parts = Regex.split(~r/\./, fun_string)
-      do_apply(module_from(parts), function_from(parts), args)
-    else
-      :erlang.apply(Kernel, String.to_atom(fun_string), args)
-    end
-  end
-
-  defp mod_specified?(fun) do
-    String.contains?(fun, ".")
+  @spec apply(atom | binary, [any]) :: any
+  def apply(fun, args) when is_atom(fun) or is_binary(fun) do
+    apply_with_inferred_module(fun, args)
   end
 
   @spec apply(fun, [any]) :: any
@@ -42,16 +22,27 @@ defmodule CSV.Invoke do
     :erlang.apply(fun, args)
   end
 
-  defp do_apply(fun, args) do
-    fun_string = to_string(fun);
-    if String.contains?(to_string(fun_string), ".") do
-      parts = Regex.split(~r/\./, fun_string)
-      do_apply(module_from(parts), function_from(parts), args)
-    else
-      :erlang.apply(Kernel, to_atom(fun), args)
+  defp apply_with_inferred_module(fun, args) do
+    case extract_module_and_function(fun) do
+      {module, function} -> do_apply(module, function, args)
+      nil                -> kernel_apply(fun, args)
     end
   end
 
+  defp extract_module_and_function(fun) do
+    case Regex.named_captures(~r/(?<module>^.*)\.(?<function>[^\.]*)$/, to_string(fun)) do
+      m when is_map(m) -> { m["module"], m["function"]}
+      nil              -> nil 
+    end
+  end
+
+  defp kernel_apply(fun, args) when is_binary(fun) do
+    kernel_apply(String.to_atom(fun), args)
+  end
+
+  defp kernel_apply(fun, args) do
+    :erlang.apply(Kernel, fun, args)
+  end
 
   def apply(module, fun, args) when is_atom(module) and is_atom(fun) do
     :erlang.apply(module, fun, args)
