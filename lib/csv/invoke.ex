@@ -22,6 +22,24 @@ defmodule CSV.Invoke do
     :erlang.apply(fun, args)
   end
 
+  def apply(modules, f_name, args) when is_list(modules) do
+    if length(modules) == 1 do
+      apply(hd(modules), f_name, args)
+    else
+      parts = Regex.split(~r/\./, to_string(f_name))
+
+      if module_specified?(parts) do
+        do_apply(module_from(parts), function_from(parts), args)
+      else
+        do_apply(find_module(f_name, modules), f_name, args)
+      end
+    end
+  end
+
+  def apply(module, fun, args) do
+    Kernel.apply(alias_for(module), atom(fun), args)
+  end
+
   defp apply_with_inferred_module(fun, args) do
     {module, function} = extract_module_and_function(fun)
     :erlang.apply(module, function, args)
@@ -29,7 +47,7 @@ defmodule CSV.Invoke do
 
   defp extract_module_and_function(fun) do
     case Regex.named_captures(~r/(?<module>^.*)\.(?<function>[^\.]*)$/, to_string(fun)) do
-      m when is_map(m) -> { to_module_atom(m["module"]), atom(m["function"])}
+      m when is_map(m) -> { alias_for(m["module"]), atom(m["function"])}
       nil              -> { Kernel, atom(fun) }
     end
   end
@@ -46,35 +64,18 @@ defmodule CSV.Invoke do
     end
   end
 
-  defp kernel_apply(fun, args) when is_binary(fun) do
-    kernel_apply(String.to_atom(fun), args)
-  end
 
-  defp kernel_apply(fun, args) do
-    :erlang.apply(Kernel, fun, args)
-  end
-
-  def apply(module, fun, args) when is_atom(module) and is_atom(fun) do
-    :erlang.apply(module, fun, args)
-  end
-
-  def apply(module, f_name, args) when is_binary(module) or is_atom(module) do
-    do_apply(module, f_name, args)
-  end
-
-  def apply(modules, f_name, args) do
-    if length(modules) == 1 do
-      do_apply(hd(modules), f_name, args)
-    else
-      parts = Regex.split(~r/\./, to_string(f_name))
-
-      if module_specified?(parts) do
-        do_apply(module_from(parts), function_from(parts), args)
-      else
-        do_apply(find_module(f_name, modules), f_name, args)
-      end
+  defp alias_for(module) do
+    try do
+      Module.safe_concat([module])
+    rescue
+      _ -> Module.concat([module])
     end
   end
+
+  ################
+
+
 
   defp do_apply(module, f_name, args) do
     Kernel.apply(to_module_atom(module), to_atom(f_name), args)
