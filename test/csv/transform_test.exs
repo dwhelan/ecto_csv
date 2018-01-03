@@ -71,7 +71,7 @@ defmodule CSV.TransformTest do
 
   describe "error handing" do
     test "with undefined function" do
-      assert Transform.transform("123", :undefined_function) === {:error, "function Elixir.undefined_function/1 is undefined (module Elixir is not available)"}
+      assert Transform.transform("123", :undefined_function) === {:error, "function Kernel.undefined_function/1 is undefined or private"}
     end
 
     test "with function clause error" do

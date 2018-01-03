@@ -1,4 +1,6 @@
 defmodule CSV.Transform do
+  require CSV.Invoke, as: Invoke
+
   def transform(value, transforms \\ [], options \\ %{}) do
     try do {:ok, transform_all(value, transforms, options)}
     rescue e -> handle_error(e)
@@ -7,23 +9,22 @@ defmodule CSV.Transform do
   end
 
   defp transform_all(value, transforms, options) do
-    Enum.reduce(wrap(transforms), value, &transform_one(&1, &2, options))
+    Enum.reduce(List.wrap(transforms), value, &transform_one(&1, &2, options))
   end
 
-  defp transform_one({module, function}, value, _options) do
-    invoke(module, function, value)
+  defp transform_one({module, fun}, value, _options) do
+    invoke(module, fun, [value])
   end
 
-  defp transform_one(function, value, options) do
-    invoke(options[:module], function, value)
+  defp transform_one(fun, value, options) do
+    invoke(options[:module], fun, [value])
   end
 
-  defp invoke(_module, f, value) when is_function(f) do
-    f.(value)
-  end
-
-  defp invoke(module, f_name, value) do
-    CSV.Invoke.apply(wrap(module), f_name, [value])
+  defp invoke(module, fun, args) do
+    case module do
+      nil -> Invoke.apply(fun, args)
+      _   -> Invoke.apply(module, fun, args)
+    end
   end
 
   defp handle_error(e) do
@@ -38,9 +39,5 @@ defmodule CSV.Transform do
     try do e.__struct__.message(e)
     rescue UndefinedFunctionError -> inspect(e)
     end 
-  end
-
-  defp wrap(value) do
-    List.wrap(value)
   end
 end

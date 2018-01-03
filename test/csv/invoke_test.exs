@@ -2,48 +2,84 @@ defmodule CSV.InvokeTest do
   use ExUnit.Case
   require CSV.Invoke, as: Invoke
 
-  # def to_int(string) do
-  #   String.to_integer(string)
-  # end
-
-  # def int_to_string(value) when is_integer(value) do
-  #   Integer.to_string(value)
-  # end
-
-  describe "apply(fun, args)" do
-    test "when 'fun' is an atom that includes a module",
+  describe "apply(fun, args) when 'fun' is an atom" do
+    test "that includes a module",
       do: assert Invoke.apply(:"Integer.to_string", [123]) === "123"
 
-    test "when 'fun' is an atom should use Kernel module",
+    test "that does not include a module -> use Kernel",
       do: assert Invoke.apply(:hd, [[1,2,3]]) === 1
 
-    test "when 'fun' is a string that includes a module",
-      do: assert Invoke.apply("Integer.to_string", [123]) === "123"
+    test "with no args",
+      do: assert Invoke.apply(:node, []) === :nonode@nohost
 
-    test "when 'fun' is a string should use Kernel module",
-      do: assert Invoke.apply("hd", [[1,2,3]]) === 1
-
-      test "when 'fun' is a function",
-      do: assert Invoke.apply(&to_string/1, [123]) === "123"
+    test "with multiple args",
+      do: assert Invoke.apply(:div, [6,3]) === 2
   end
 
-  describe "apply(module, fun, args)" do
-    test "when 'module' is a module and 'fun' is an atom",
+  describe "apply(fun, args) when 'fun' is a binary" do
+    test "that includes a module",
+      do: assert Invoke.apply("Integer.to_string", [123]) === "123"
+
+    test "that does not include a module -> use Kernel",
+      do: assert Invoke.apply("hd", [[1,2,3]]) === 1
+
+    test "with no args",
+      do: assert Invoke.apply("node", []) === :nonode@nohost
+
+    test "with multiple args",
+      do: assert Invoke.apply("div", [6,3]) === 2
+  end
+
+  describe "apply(fun, args) when 'fun' is a function" do
+    test "with no args",
+      do: assert Invoke.apply(&node/0, []) === :nonode@nohost
+
+    test "with one arg",
+      do: assert Invoke.apply(&to_string/1, [123]) === "123"
+
+    test "with multiple args",
+      do: assert Invoke.apply(&div/2, [6,3]) === 2
+  end
+
+  describe "apply(module, fun, args) when 'module' is a module" do
+    test "and 'fun' is an atom",
       do: assert Invoke.apply(Integer, :to_string, [123]) === "123"
 
-    test "when 'module' is a module and 'fun' is a string",
+    test "and 'fun' is a binary",
       do: assert Invoke.apply(Integer, "to_string", [123]) === "123"
 
-    test "when 'module' is a string and 'fun' is an atom",
+    test "with no args",
+      do: assert Invoke.apply(Kernel, :node, []) === :nonode@nohost
+
+    test "with multiple args",
+      do: assert Invoke.apply(Kernel, :div, [6,3]) === 2
+  end
+
+  describe "apply(module, fun, args) when 'module' is a binary" do
+    test "and 'fun' is an atom",
       do: assert Invoke.apply("Integer", :to_string, [123]) === "123"
 
-    test "when 'module' is a string and 'fun' is a string",
+    test "and 'fun' is a binary",
       do: assert Invoke.apply("Integer", "to_string", [123]) === "123"
 
-    test "when 'module' is an atom and 'fun' is an atom",
+    test "with no args",
+      do: assert Invoke.apply("Kernel", :node, []) === :nonode@nohost
+
+    test "with multiple args",
+      do: assert Invoke.apply("Kernel", :div, [6,3]) === 2
+  end
+
+  describe "apply(module, fun, args) when 'module' is an atom" do
+    test "and 'fun' is an atom",
       do: assert Invoke.apply(:Integer, :to_string, [123]) === "123"
 
-    test "when 'module' is an atom and 'fun' is a string",
+    test "and 'fun' is a binary",
       do: assert Invoke.apply(:Integer, "to_string", [123]) === "123"
-    end
+
+    test "with no args",
+      do: assert Invoke.apply(:Kernel, :node, []) === :nonode@nohost
+
+    test "with multiple args",
+      do: assert Invoke.apply(:Kernel, :div, [6,3]) === 2
+  end
 end
