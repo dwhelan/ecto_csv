@@ -1,6 +1,6 @@
-defmodule CSV.InvokeTest do
+defmodule InvokeTest do
   use ExUnit.Case
-  require CSV.Invoke, as: Invoke
+  require Invoke
 
   describe "apply(fun, args) when 'fun' is an atom" do
     test "that includes a module",

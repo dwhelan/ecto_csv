@@ -1,4 +1,4 @@
-defmodule CSV.Invoke do
+defmodule Invoke do
   import Kernel, except: [apply: 2, apply: 3]
 
   @doc """

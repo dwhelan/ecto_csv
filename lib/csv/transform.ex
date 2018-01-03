@@ -1,5 +1,5 @@
 defmodule CSV.Transform do
-  require CSV.Invoke, as: Invoke
+  require Invoke
 
   def transform(value, transforms \\ [], options \\ %{}) do
     try do {:ok, transform_all(value, transforms, options)}
