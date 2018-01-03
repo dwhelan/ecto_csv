@@ -23,16 +23,26 @@ defmodule CSV.Invoke do
   end
 
   defp apply_with_inferred_module(fun, args) do
-    case extract_module_and_function(fun) do
-      {module, function} -> do_apply(module, function, args)
-      nil                -> kernel_apply(fun, args)
-    end
+    {module, function} = extract_module_and_function(fun)
+    :erlang.apply(module, function, args)
   end
 
   defp extract_module_and_function(fun) do
     case Regex.named_captures(~r/(?<module>^.*)\.(?<function>[^\.]*)$/, to_string(fun)) do
-      m when is_map(m) -> { m["module"], m["function"]}
-      nil              -> nil 
+      m when is_map(m) -> { to_module_atom(m["module"]), atom(m["function"])}
+      nil              -> { Kernel, atom(fun) }
+    end
+  end
+
+  defp atom(atom) when is_atom(atom) do
+    atom
+  end
+
+  defp atom(string) do
+    try do
+      String.to_existing_atom(string)
+    rescue
+      _ -> String.to_atom(string)
     end
   end
 
