@@ -23,8 +23,8 @@ defmodule CSV.Schema do
     end
   end
 
-  def add_column(schema, name, options \\ []) when is_map(schema) and is_binary(name) and is_list(options) do
+  def add_column(schema, name, module \\ String, options \\ []) when is_map(schema) and is_binary(name) and is_list(options) do
     columns = Map.get(schema, :columns, [])
-    Map.put(schema, :columns, columns ++ [{name, options}])
+    Map.put(schema, :columns, columns ++ [{name, module, options}])
   end
 end

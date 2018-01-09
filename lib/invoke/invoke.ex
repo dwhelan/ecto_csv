@@ -13,7 +13,6 @@ defmodule Invoke do
       3
       iex> Invoke.apply("Kernel.div", [6,3])
       2
-
   """
   @spec apply(atom | binary, [any]) :: any
   def apply(fun, args) when is_atom(fun) or is_binary(fun) do
@@ -70,6 +69,7 @@ defmodule Invoke do
   end
 
   defp module_and_function(fun) do
+    # "String.to_integer"
     case Regex.named_captures(~r/(?<module>^.*)\.(?<function>[^\.]*)$/, to_string(fun)) do
       m when is_map(m) -> {m["module"], m["function"]}
       nil              -> {nil, fun}

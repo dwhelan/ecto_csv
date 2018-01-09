@@ -1,17 +1,14 @@
 defmodule CSV.SchemaMacrosTest do
-  use CSV.Schema
+  # use CSV.Schema
 
-  column "Name"
-  column "Age", type: Integer
-  column "DOB", type: Date, format: "{YYYY}-{0M}-{0D}"
+  # modules_allowed ["Kernel"]
+  
+  # column "Name"
+  # column "Age", type: Integer
+  # column "DOB", ["validate_date", "to_date", "validate", [ "year", ">'", "1800"]
 
-  use ExUnit.Case
-
-  test "create columns" do
-    assert schema().columns() === [
-      {"Name", []},
-      {"Age",  type: Integer},
-      {"DOB",  type: Date, format: "{YYYY}-{0M}-{0D}"},
-    ]
-  end
+  # [
+  #   "DOB" => {:ok, Date}
+  #   "DOB" => {:error, "must be greater than 1800"}
+  # ]
 end
