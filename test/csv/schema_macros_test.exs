@@ -1,14 +1,20 @@
 defmodule CSV.SchemaMacrosTest do
-  # use CSV.Schema
+  use CSV.Schema
+  use ExUnit.Case
 
-  # modules_allowed ["Kernel"]
-  
-  # column "Name"
-  # column "Age", type: Integer
-  # column "DOB", ["validate_date", "to_date", "validate", [ "year", ">'", "1800"]
+  column "Name"
+  column "Age", Integer
+  column "DOB", Date, format: "{YYYY}-{0M}-{0D}"
 
-  # [
-  #   "DOB" => {:ok, Date}
-  #   "DOB" => {:error, "must be greater than 1800"}
-  # ]
+  test "column with a name only defaults module to 'String'" do
+    assert @schema.columns["Name"] === {String, []}
+  end
+
+  test "column with a module sets the module" do
+    assert @schema.columns["Age"] === {Integer, []}
+  end
+
+  test "column with module and options sets both" do
+    assert @schema.columns["DOB"] === {Date, format: "{YYYY}-{0M}-{0D}"}
+  end
 end

@@ -17,14 +17,15 @@ defmodule CSV.Schema do
     end
   end
 
-  defmacro column(name, options \\ Macro.escape([])) do
-    quote bind_quoted: [name: name, options: options] do
-      @schema CSV.Schema.add_column(@schema, name, options)
+  defmacro column(name, module \\ String, options \\ Macro.escape([])) do
+    quote bind_quoted: [name: name, module: module, options: options] do
+      @schema CSV.Schema.add_column(@schema, name, module, options)
     end
   end
 
   def add_column(schema, name, module \\ String, options \\ []) when is_map(schema) and is_binary(name) and is_list(options) do
-    columns = Map.get(schema, :columns, [])
-    Map.put(schema, :columns, columns ++ [{name, module, options}])
+    columns = Map.get(schema, :columns, %{})
+    columns = Map.put(columns, name, {module, options})
+    Map.put(schema, :columns, columns)
   end
 end
