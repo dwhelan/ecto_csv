@@ -1,7 +1,7 @@
 defmodule CSV.Loader do
 
   def load(path, schema) when is_binary(path) do
-    load(File.stream!(path), schema)
+    load(File.stream!(path) |> CSV.Parser.parse , schema)
   end
 
   def load(stream, schema) do

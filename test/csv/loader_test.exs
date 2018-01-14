@@ -41,11 +41,11 @@ defmodule CSV.LoaderTest do
 
     test "that records can be read from a file" do
       path = create_test_file """
-      A,B,C
+      a,b,c
       1,2,3
       """
-      records = load_all(path)
-      assert records == ""
+      records = load_one(path)
+      assert records = %{a: "1", b: 2, c: "3"}
     end
   end
 
