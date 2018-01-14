@@ -8,33 +8,38 @@ defmodule CSV.Dumper do
   end
 
   def dump(stream, schema) do
-    header = Enum.map(schema.__csv__(:columns), &Kernel.to_string/1)
-
-    insert_header(stream, header)
-    |> Stream.map(fn line -> dump_row(line, header) end)
-    |> format
-    |> Stream.map(fn line -> IO.iodata_to_binary(line) end)
+    stream
+    |> transform_to_list
+    |> transform_to_csv_string
   end
 
-  defp insert_header(stream, header) do
-    [:_, :_]
-    |> Stream.transform(:insert_header, fn _, what_to_do ->
-        case what_to_do do
-          :insert_header -> { [header], :stream }
-          :stream        -> { stream,   :_}
-        end
-      end )
+  defp header(schema) do
+    Enum.map(schema.__csv__(:columns), &Kernel.to_string/1)
   end
 
-  defp dump_row(row, _headers) when is_list(row) do
-    row
+  defp header_list(data) do
+    header(data.__struct__)
   end
 
-  defp dump_row(row, header) do
-    Enum.map(header, fn header -> Map.get(row, String.to_atom(header)) || "" end)
+  defp row_list(data) do
+    header = header_list(data)
+    Enum.map(header, fn header -> Map.get(data, String.to_atom(header)) || "" end)
   end
 
-  defp format(stream) do
-    Formatter.dump_to_stream(stream)
+  def transform_to_list(stream) do
+    Stream.transform(stream, 0, fn data, index ->
+      if index == 0 do
+        {[header_list(data), row_list(data)], index + 1}
+      else
+        {[row_list(data)], index + 1}
+      end
+    end )
+  end
+
+  defp transform_to_csv_string(stream) do
+    stream
+    |> Formatter.dump_to_stream
+    |> Stream.map(&IO.iodata_to_binary(&1))
   end
 end
+
