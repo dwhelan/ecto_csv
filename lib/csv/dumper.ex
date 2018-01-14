@@ -13,19 +13,6 @@ defmodule CSV.Dumper do
     |> transform_to_csv_string
   end
 
-  defp header(schema) do
-    Enum.map(schema.__csv__(:columns), &Kernel.to_string/1)
-  end
-
-  defp header_list(data) do
-    header(data.__struct__)
-  end
-
-  defp row_list(data) do
-    header = header_list(data)
-    Enum.map(header, fn header -> Map.get(data, String.to_atom(header)) || "" end)
-  end
-
   def transform_to_list(stream) do
     Stream.transform(stream, 0, fn data, index ->
       if index == 0 do
@@ -40,6 +27,16 @@ defmodule CSV.Dumper do
     stream
     |> Formatter.dump_to_stream
     |> Stream.map(&IO.iodata_to_binary(&1))
+  end
+
+  defp header_list(data) do
+    schema = data.__struct__
+    Enum.map(schema.__csv__(:columns), &Kernel.to_string/1)
+  end
+
+  defp row_list(data) do
+    header = header_list(data)
+    Enum.map(header, fn header -> Map.get(data, String.to_atom(header)) || "" end)
   end
 end
 
