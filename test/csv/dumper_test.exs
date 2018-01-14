@@ -21,12 +21,12 @@ defmodule CSV.DumperTest do
 
     test "that structs can be dumped to files" do
       path = TestFile.create();
-      CSV.Dumper.dump([%Example{a: "1", b: 2}, %Example{a: "4", b: 5}], Example, path)
+      CSV.Dumper.dump([%Example{a: "1", b: 2}, %Example{a: "4", b: 5}], path)
       assert {:ok, "a,b\n1,2\n4,5\n"} = File.read(path)
     end
   end
 
   defp dump(lines) do
-    CSV.Dumper.dump(List.wrap(lines), Example) |> Enum.to_list
+    CSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
   end
 end
