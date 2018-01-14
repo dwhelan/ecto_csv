@@ -17,11 +17,11 @@ defmodule CSV.Dumper do
   end
 
   defp insert_header(stream, header) do
-    [:_, :stream]
-    |> Stream.transform(:insert_header, fn _, what_to_stream ->
-        case what_to_stream do
+    [:_, :_]
+    |> Stream.transform(:insert_header, fn _, what_to_do ->
+        case what_to_do do
           :insert_header -> { [header], :stream }
-          :stream        -> { stream, :stream}
+          :stream        -> { stream,   :_}
         end
       end )
   end
