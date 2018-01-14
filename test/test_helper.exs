@@ -10,7 +10,6 @@ defmodule CompileTimeAssertions do
     end
   end
 
-
   # defmacro assert_compile_error(expected_exception, expected_message, fun) do
   #   # At compile-time, the fun is in AST form and thus cannot raise.
   #   # At run-time, we will evaluate this AST, and it may raise.
@@ -22,4 +21,12 @@ defmodule CompileTimeAssertions do
   #     end
   #   end
   # end
+end
+
+defmodule TestFile do 
+  def create(content) do
+    path = Briefly.create!
+    File.write!(path, content)
+    path
+  end
 end

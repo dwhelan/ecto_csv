@@ -23,23 +23,19 @@ defmodule CSV.LoaderTest do
     end
 
     test "should ignore fields not defined in the schema" do
-      record = load_one ["a,x", "1,2"]
-      assert %Example{a: "1"} = record
-      assert !Map.has_key?(record, :x)
+      refute load_one(["x", "1"]) |> Map.has_key?(:x)
     end
 
     test "that multiple rows can be loaded" do
-      records = load_all ["a", "1", "2"]
-      assert length(records) == 2
+      assert load_all(["a", "1", "2"]) |> length == 2
     end
 
     test "that multiple fields in a row can be loaded" do
       assert %{a: "1", b: 2, c: 1.23} = load_one ["a,b,c", "1,2,1.23"]
     end
 
-    test "that records can be read from a file" do
-      path = create_test_file "a,b,c\n1,2,3"
-      assert %{a: "1", b: 2, c: 3.0} = load_one(path)
+    test "that structs can be loaded from files" do
+      assert %{a: "1", b: 2, c: 3.0} = load_one(TestFile.create("a,b,c\n1,2,3"))
     end
   end
 
@@ -56,12 +52,6 @@ defmodule CSV.LoaderTest do
   end
   
   defp load(lines) do
-    CSV.Loader.load(lines, CSV.LoaderTest.Example)
-  end
-
-  defp create_test_file(content) do
-    path = Briefly.create!
-    File.write!(path, content)
-    path
+    CSV.Loader.load(lines, Example)
   end
 end
