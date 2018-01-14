@@ -1,10 +1,12 @@
 defmodule CSV.Loader do
 
   def load(path, schema) when is_binary(path) do
-    load(File.stream!(path) |> CSV.Parser.parse , schema)
+    load(File.stream!(path), schema)
   end
 
   def load(stream, schema) do
+    stream = stream |> CSV.Parser.parse
+    
     headers = hd(Enum.take(stream, 1))
 
     stream
@@ -20,6 +22,7 @@ defmodule CSV.Loader do
 
   defp update({name, string}, record, schema) do
     field = String.to_atom(name)
-    Map.put(record, field, CSV.Schema.cast(schema, field, string))
+    value =  CSV.Schema.cast(schema, field, string)
+    struct(record, Keyword.new([{field, value}]))
   end
 end

@@ -9,43 +9,37 @@ defmodule CSV.LoaderTest do
     columns do
       column :a
       column :b, :integer
+      column :c, :float
     end
   end
 
   describe "load" do
     test "columns with no data type gets a type of 'string'" do
-      record = load_one [["a"], ["1"]]
-      assert record.a == "1"
+      assert %Example{a: "1"} = load_one(["a", "1"])
     end
 
     test "values are converted to the defined data type" do
-      record = load_one [["b"], ["1"]]
-      assert record.b == 1
+      assert %Example{b: 1} = load_one(["b", "1"])
     end
 
-    test "should dynamically add unknown columns to the record as a string" do
-      record = load_one [["X"], ["seven"]]
-      assert record."X" == "seven"
+    test "should ignore fields not defined in the schema" do
+      record = load_one ["a,x", "1,2"]
+      assert %Example{a: "1"} = record
+      assert !Map.has_key?(record, :x)
     end
 
     test "that multiple rows can be loaded" do
-      records = load_all [["a"], ["1"], ["2"]]
+      records = load_all ["a", "1", "2"]
       assert length(records) == 2
     end
 
     test "that multiple fields in a row can be loaded" do
-      record = load_one [["a", "b"], ["1", "2"]]
-      assert record.a == "1"
-      assert record.b == 2
+      assert %{a: "1", b: 2, c: 1.23} = load_one ["a,b,c", "1,2,1.23"]
     end
 
     test "that records can be read from a file" do
-      path = create_test_file """
-      a,b,c
-      1,2,3
-      """
-      records = load_one(path)
-      assert records = %{a: "1", b: 2, c: "3"}
+      path = create_test_file "a,b,c\n1,2,3"
+      assert %{a: "1", b: 2, c: 3.0} = load_one(path)
     end
   end
 
