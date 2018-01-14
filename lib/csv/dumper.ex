@@ -2,7 +2,7 @@ defmodule CSV.Dumper do
   alias NimbleCSV.RFC4180, as: Formatter
 
   def dump(stream, schema, path) do
-    output = File.stream(path)
+    output = File.stream!(path)
     dump(stream, schema)
     |> Enum.into(output)
   end
