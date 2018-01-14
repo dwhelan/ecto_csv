@@ -1,11 +1,12 @@
 defmodule CSV.Loader do
+  alias NimbleCSV.RFC4180, as: Parser
 
   def load(path, schema) when is_binary(path) do
     load(File.stream!(path), schema)
   end
 
   def load(stream, schema) do
-    stream = stream |> CSV.Parser.parse
+    stream = stream |> parse
     
     headers = hd(Enum.take(stream, 1))
 
@@ -24,5 +25,9 @@ defmodule CSV.Loader do
     field = String.to_atom(name)
     value =  CSV.Schema.cast(schema, field, string)
     struct(record, Keyword.new([{field, value}]))
+  end
+
+  def parse(stream) do
+    Parser.parse_stream(stream, headers: false)
   end
 end
