@@ -1,4 +1,4 @@
-ExUnit.start()
+ExUnit.start(exclude: [:skip, :wip])
 
 # From https://gist.github.com/henrik/1054546364ac68da4102
 defmodule CompileTimeAssertions do
@@ -24,7 +24,7 @@ defmodule CompileTimeAssertions do
 end
 
 defmodule TestFile do 
-  def create(content) do
+  def create(content \\ "") do
     path = Briefly.create!
     File.write!(path, content)
     path

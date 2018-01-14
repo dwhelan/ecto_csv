@@ -5,3 +5,6 @@
     * file with headers
 * records
     * allow structs to have additional data (via Map.update() but struct access won't work)
+* CSV schema - can csv behaviour be treated as an extension to schema?
+    * use plain ecto schema macros and functions
+    * add csv specific macros
