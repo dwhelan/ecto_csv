@@ -13,7 +13,7 @@ defmodule CSV.IntegrationTest do
 
   describe "loading and then dumping retains values" do
     test "via files" do
-      in_content = "a,b,c\n1,2,3.45\n7,8,9.1\n"
+      in_content = "a,b,c\n 1 ,2,3.45\n7,8,9.1\n"
       in_path    = TestFile.create(in_content);
       out_path   = TestFile.create();
 

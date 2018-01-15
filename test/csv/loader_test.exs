@@ -13,7 +13,7 @@ defmodule CSV.LoaderTest do
     end
   end
 
-  describe "load" do
+  describe "load from stream" do
     test "columns with no data type gets a type of 'string'" do
       assert %Example{a: "1"} = load_one(["a", "1"])
     end
@@ -22,20 +22,26 @@ defmodule CSV.LoaderTest do
       assert %Example{b: 1} = load_one(["b", "1"])
     end
 
-    test "should ignore fields not defined in the schema" do
+    test "fields not defined in the schema are ignored" do
       refute load_one(["x", "1"]) |> Map.has_key?(:x)
     end
 
-    test "that multiple rows can be loaded" do
+    test "multiple rows can be loaded" do
       assert load_all(["a", "1", "2"]) |> length == 2
     end
 
-    test "that multiple fields in a row can be loaded" do
-      assert %{a: "1", b: 2, c: 1.23} = load_one ["a,b,c", "1,2,1.23"]
+    test "multiple fields per row can be loaded" do
+      assert %{a: "1", b: 2, c: 3.45} = load_one ["a,b,c", "1,2,3.45"]
     end
 
-    test "that structs can be loaded from files" do
-      assert %{a: "1", b: 2, c: 3.0} = load_one(TestFile.create("a,b,c\n1,2,3"))
+    test "white space is preserved on strings" do
+      assert %{a: " 1 ", b: 2, c: 3.45} = load_one ["a,b,c", " 1 ,2,3.45"]
+    end
+  end
+
+  describe "load from file" do
+    test "structs from csv" do
+      assert %{a: "1", b: 2, c: 3.45} = load_one(TestFile.create("a,b,c\n1,2,3.45"))
     end
   end
 
