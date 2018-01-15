@@ -23,25 +23,19 @@ defmodule Transform.StructTest do
   end
   
   defmodule Transform do
-    def cast(struct, module) do
-      keys = 
+    def cast(struct, mod) do
       Map.keys(struct)
       |> remove_meta_keys
-      |> copy_values(struct, module)
+      |> copy_values(struct, mod)
     end
 
     @does_not_start_with__ ~r/^(?!__).+/
     defp remove_meta_keys(keys) do
-      Enum.filter(keys, fn key ->
-        Regex.match?(@does_not_start_with__, Atom.to_string(key))
-      end)
+      Enum.filter(keys, &Regex.match?(@does_not_start_with__, Atom.to_string(&1)))
     end
 
-    defp copy_values(keys, struct, module) do
-      Enum.reduce(keys, struct(module), fn key, result ->
-        value = Map.get(struct, key)
-        Map.put(result, key, value)
-      end)
+    defp copy_values(keys, struct, mod) do
+      Enum.reduce(keys, struct(mod), &Map.put(&2, &1, Map.get(struct, &1)))
     end
   end
 
