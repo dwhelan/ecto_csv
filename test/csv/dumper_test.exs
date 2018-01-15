@@ -11,22 +11,26 @@ defmodule CSV.DumperTest do
   end
 
   describe "dump" do
+    test "header is created" do
+      assert ["a,b\n", _] = dump(%Example{})
+    end
+
     test "columns with no data type should be dumped as strings" do
-      assert dump(%Example{a: "A"}) == ["a,b\n", "A,\n"]
+      assert [_, "A,\n"] = dump(%Example{a: "A"})
     end
 
     test "columns with a data type should be dumped as their type" do
-      assert dump(%Example{b: 1}) == ["a,b\n", ",1\n"]
+      assert [_, ",1\n"] = dump(%Example{b: 1})
     end
 
     test "double quotes are preserved in strings" do
-      assert dump(%Example{a: ~s{ "hi" there}}) == ["a,b\n", ~s{" ""hi"" there",\n}]
+      assert [_, ~s{" ""hi"" there",\n}] = dump(%Example{a: ~s{ "hi" there}})
     end
 
     test "that structs can be dumped to files" do
       path = TestFile.create();
-      CSV.Dumper.dump([%Example{a: "1", b: 2}, %Example{a: "4", b: 5}], path)
-      assert {:ok, "a,b\n1,2\n4,5\n"} = File.read(path)
+      CSV.Dumper.dump([%Example{a: "1", b: 2}, %Example{a: "3", b: 4}], path)
+      assert {:ok, "a,b\n1,2\n3,4\n"} = File.read(path)
     end
   end
 
