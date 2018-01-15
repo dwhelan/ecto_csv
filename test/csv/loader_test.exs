@@ -34,8 +34,12 @@ defmodule CSV.LoaderTest do
       assert %{a: "1", b: 2, c: 3.45} = load_one ["a,b,c", "1,2,3.45"]
     end
 
-    test "white space is preserved on strings" do
-      assert %{a: " 1 ", b: 2, c: 3.45} = load_one ["a,b,c", " 1 ,2,3.45"]
+    test "white space is preserved in strings" do
+      assert %{a: " 1 "} = load_one ["a,b,c", " 1 ,2,3.45"]
+    end
+
+    test "double quotes are preserved in strings" do
+      assert %{a: ~s{ "hi" there}} = load_one ["a,b,c", ~s{" ""hi"" there",2,3.45}]
     end
   end
 

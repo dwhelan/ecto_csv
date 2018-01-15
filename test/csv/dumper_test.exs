@@ -19,6 +19,10 @@ defmodule CSV.DumperTest do
       assert dump(%Example{b: 1}) == ["a,b\n", ",1\n"]
     end
 
+    test "double quotes are preserved in strings" do
+      assert dump(%Example{a: ~s{ "hi" there}}) == ["a,b\n", ~s{" ""hi"" there",\n}]
+    end
+
     test "that structs can be dumped to files" do
       path = TestFile.create();
       CSV.Dumper.dump([%Example{a: "1", b: 2}, %Example{a: "4", b: 5}], path)
