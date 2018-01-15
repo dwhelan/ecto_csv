@@ -1,5 +1,13 @@
 # CSV
 * rename to EctoCSV
+* loader
+    * import with no schema
+    * load streams without headers
+* dumper
+    * get headers at compile time from schema
+    * dump structs without schemas
+    * dump maps
+    * dump lists
 * headers
     * file with no headers - assume ordinality of configured columns
     * file with headers

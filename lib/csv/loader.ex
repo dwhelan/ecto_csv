@@ -24,7 +24,7 @@ defmodule CSV.Loader do
         true  -> { [], false }
         false -> { [struct], false }
       end
-    end )
+    end)
   end
 
   def to_values(stream) do
