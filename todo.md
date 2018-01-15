@@ -3,6 +3,9 @@
 * loader
     * import with no schema
     * load streams without headers
+    * load from string with \n's and split (could be tricky to handle \n within strings)
+    * auto create struct on import (all values are strings)
+
 * dumper
     * get headers at compile time from schema
     * dump structs without schemas

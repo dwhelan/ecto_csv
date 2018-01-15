@@ -13,14 +13,23 @@ defmodule CSV.IntegrationTest do
 
   describe "loading and then dumping retains values" do
     test "via files" do
-      in_content = "a,b,c\n 1 ,2,3.45\n7,8,9.1\n"
-      in_path    = TestFile.create(in_content);
-      out_path   = TestFile.create();
-
-      CSV.Loader.load(in_path, Example) |> CSV.Dumper.dump(out_path)
-
-      {:ok, out_content} = File.read(out_path)
-      assert out_content == in_content
+      content = "a,b,c\n 1 ,2,3.45\n6,7,8.1\n"
+      assert load_and_dump(content) == content
     end
+
+    test "white spaces and double quotes are preserved" do
+      content = ~s{a,b,c\n" ""hi"" there",1,2.3\n}
+      assert load_and_dump(content) == content
+    end
+  end
+
+  defp load_and_dump(content) do
+    in_path  = TestFile.create(content);
+    out_path = TestFile.create();
+
+    CSV.Loader.load(in_path, Example) |> CSV.Dumper.dump(out_path)
+
+    {:ok, content} = File.read(out_path)
+    content
   end
 end
