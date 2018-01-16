@@ -1,5 +1,5 @@
 # CSV
-* force atom names for column names
+* handle header row with blank cells (allow code to specify name or field number)
 * rename to EctoCSV
 * loader
     * import with no schema -> create map
@@ -13,7 +13,7 @@
     * dump structs
     * dump maps
 * headers
-    * file with no headers - assume ordinality of configured columns
+    * file with no headers - assume ordinality of configured fields
     * file with headers
 * records
     * allow structs to have additional data (via Map.update() but struct access won't work)

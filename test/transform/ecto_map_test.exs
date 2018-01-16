@@ -5,20 +5,20 @@ defmodule Transform.EctoMapTest do
   defmodule Example do
     use CSV.Schema
 
-    columns do
-      column :a
-      column :b, :integer
-      column :c, :float
+    schema "test" do
+      field :a
+      field :b, :integer
+      field :c, :float
     end
   end
 
   defmodule Result do
     use CSV.Schema
 
-    columns do
-      column :a, :string
-      column :b, :integer
-      column :c, :float
+    schema "test" do
+      field :a, :string
+      field :b, :integer
+      field :c, :float
     end
   end
 

@@ -4,10 +4,10 @@ defmodule CSV.DumperTest do
   defmodule Example do
     use CSV.Schema
 
-    columns do
-      column :a
-      column :b, :integer
-      column :c, :float
+    schema "test" do
+      field :a
+      field :b, :integer
+      field :c, :float
     end
   end
 
@@ -16,11 +16,11 @@ defmodule CSV.DumperTest do
       assert ["a,b,c\n", _] = dump(%Example{})
     end
 
-    test "columns with no data type should be dumped as empty strings" do
+    test "fields with no data type should be dumped as empty strings" do
       assert [_, ",,\n"] = dump(%Example{})
     end
 
-    test "columns with a data type should be dumped as their type" do
+    test "fields with a data type should be dumped as their type" do
       assert [_, ",2,3.4\n"] = dump(%Example{b: 2, c: 3.4})
     end
 

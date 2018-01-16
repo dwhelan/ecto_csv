@@ -15,9 +15,6 @@ def deps do
 end
 ```
 
-## To do
-- handle header row with blank cells (allow code to specify name or column number)
-
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/data_conv](https://hexdocs.pm/data_conv).

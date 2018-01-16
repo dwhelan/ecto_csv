@@ -6,15 +6,15 @@ defmodule CSV.LoaderTest do
   defmodule Example do
     use CSV.Schema
 
-    columns do
-      column :a
-      column :b, :integer
-      column :c, :float
+    schema "test" do
+      field :a
+      field :b, :integer
+      field :c, :float
     end
   end
 
   describe "load from stream" do
-    test "columns with no data type gets a type of 'string'" do
+    test "fields with no data type gets a type of 'string'" do
       assert %Example{a: "1"} = load_one(["a", "1"])
     end
 
