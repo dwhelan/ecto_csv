@@ -11,7 +11,7 @@ defmodule CSV.Dumper do
     |> to_csv
   end
 
-  def to_values(stream) do
+  defp to_values(stream) do
     Stream.transform(stream, 0, fn struct, index -> { row_values(struct, index), index + 1 } end )
   end
 
@@ -21,25 +21,23 @@ defmodule CSV.Dumper do
     |> Stream.map(&IO.iodata_to_binary(&1))
   end
 
-  defp row_values(struct, index) do
-    headers    = headers(struct)
-    row_values = struct_to_values(struct, headers)
-
-    case index do
-      0 -> [headers, row_values]
-      _ -> [row_values]
-    end
+  defp row_values(struct, 0) do
+    [header_values(struct) | row_values(struct, 1)]
   end
 
-  defp struct_to_values(struct, headers) do
-    Enum.map(headers, &struct_value(struct, &1))
+  defp row_values(struct, _) do
+    [struct_to_values(struct)]
+  end
+
+  defp struct_to_values(struct) do
+    Enum.map(header_values(struct), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, key) do
     Map.get(struct, String.to_atom(key)) || ""
   end
 
-  defp headers(struct) do
+  defp header_values(struct) do
     schema  = struct.__struct__
     columns = schema.__csv__(:columns)
     Enum.map(columns, &Kernel.to_string/1)
