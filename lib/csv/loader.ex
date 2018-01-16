@@ -9,7 +9,7 @@ defmodule CSV.Loader do
     _headers = stream_headers(stream)
     headers = CSV.headers(mod)
 
-    stream = if CSV.file_has_headers?(mod), do: stream |> remove_header, else: stream
+    stream = if CSV.file_has_header?(mod), do: stream |> remove_header, else: stream
     
     stream
     |> to_values

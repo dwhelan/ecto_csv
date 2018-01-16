@@ -22,7 +22,7 @@ defmodule CSV.Dumper do
   end
 
   defp row_values(struct, index) do
-    if index == 0 && CSV.file_has_headers?(struct) do
+    if index == 0 && CSV.file_has_header?(struct) do
       [CSV.headers(struct), row_values(struct)]
     else
       [row_values(struct)]

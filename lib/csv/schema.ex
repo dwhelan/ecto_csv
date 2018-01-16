@@ -34,8 +34,8 @@ defmodule CSV.Schema do
 
   def __csv__(header) do
     quote do
-      def __csv__(:header),            do: unquote(header)
-      def __csv__(:file_has_headers?), do: unquote(header != false)
+      def __csv__(:header),           do: unquote(header)
+      def __csv__(:file_has_header?), do: unquote(header != false)
     end
   end
 
