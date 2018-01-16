@@ -1,6 +1,8 @@
 defmodule CSV.Schema do
   alias Ecto.Type
 
+  @primary_key false
+  
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)

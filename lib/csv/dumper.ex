@@ -32,13 +32,13 @@ defmodule CSV.Dumper do
     Enum.map(header_values(struct), &struct_value(struct, &1))
   end
 
-  defp struct_value(struct, key) do
-    Map.get(struct, String.to_atom(key)) || ""
+  defp struct_value(struct, field) do
+    Map.get(struct, field) || ""
   end
 
   defp header_values(struct) do
-    schema  = struct.__struct__
-    columns = schema.__csv__(:columns)
-    Enum.map(columns, &Kernel.to_string/1)
+    mod  = struct.__struct__    
+    mod.__schema__(:fields)
+    |> Enum.filter(&(&1 != :id))
   end
 end
