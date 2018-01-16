@@ -43,6 +43,7 @@ defmodule CSV.LoaderTest do
     end
   end
 
+  
   defmodule ExampleWithoutHeaders do
     use CSV.Schema
 
