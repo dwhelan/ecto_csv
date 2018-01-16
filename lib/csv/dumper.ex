@@ -22,33 +22,18 @@ defmodule CSV.Dumper do
   end
 
   defp row_values(struct, index) do
-    if index == 0 && dump_headers?(struct) do
-      [header_values(struct), row_values(struct)]
+    if index == 0 && CSV.has_headers?(struct) do
+      [CSV.headers(struct), row_values(struct)]
     else
       [row_values(struct)]
     end
   end
 
-  defp dump_headers?(struct) do
-    mod = struct.__struct__
-    if Keyword.has_key?(mod.__info__(:functions), :__csv__) do
-      mod.__csv__(:headers)
-    else
-      true
-    end
-  end
-
   defp row_values(struct) do
-    Enum.map(header_values(struct), &struct_value(struct, &1))
+    Enum.map(CSV.headers(struct), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do
     Map.get(struct, field) || ""
-  end
-
-  defp header_values(struct) do
-    mod  = struct.__struct__    
-    mod.__schema__(:fields)
-    |> Enum.filter(&(&1 != :id))
   end
 end

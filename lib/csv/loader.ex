@@ -21,10 +21,10 @@ defmodule CSV.Loader do
   end
 
   defp remove_header(stream) do
-    Stream.transform(stream, true, fn struct, is_header -> 
-      case is_header do
-        true  -> { [], false }
-        false -> { [struct], false }
+    Stream.transform(stream, 0, fn struct, index -> 
+      case index do
+        0 -> {[],       :_}
+        _ -> {[struct], :_}
       end
     end)
   end
@@ -41,8 +41,7 @@ defmodule CSV.Loader do
     Enum.zip(headers, values) |> Enum.reduce(struct(mod), &set_struct_value(&1, &2, mod))
   end
 
-  defp set_struct_value({name, value}, struct, mod) do
-    field = String.to_atom(name)
+  defp set_struct_value({field, value}, struct, mod) do
     value = CSV.Schema.cast(mod, field, value)
     struct(struct, Keyword.new([{field, value}]))
   end
