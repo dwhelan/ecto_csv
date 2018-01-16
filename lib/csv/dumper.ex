@@ -22,9 +22,19 @@ defmodule CSV.Dumper do
   end
 
   defp row_values(struct, index) do
-    case index do
-      0 -> [header_values(struct), row_values(struct)]
-      _ -> [row_values(struct)]
+    if index == 0 && dump_headers?(struct) do
+      [header_values(struct), row_values(struct)]
+    else
+      [row_values(struct)]
+    end
+  end
+
+  defp dump_headers?(struct) do
+    mod = struct.__struct__
+    if Keyword.has_key?(mod.__info__(:functions), :__csv__) do
+      mod.__csv__(:headers)
+    else
+      true
     end
   end
 

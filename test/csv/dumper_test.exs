@@ -28,10 +28,46 @@ defmodule CSV.DumperTest do
       assert [_, ~s{" ""hi"" there",,\n}] = dump(%Example{a: ~s{ "hi" there}})
     end
 
-    test "that structs can be dumped to files" do
+    test "that records can be dumped to files" do
       path = TestFile.create();
       CSV.Dumper.dump([%Example{a: "hi", b: 2, c: 3.4}, %Example{a: "there", b: 5, c: 6.7}], path)
       assert {:ok, "a,b,c\nhi,2,3.4\nthere,5,6.7\n"} = File.read(path)
+    end
+  end
+
+  defmodule ExampleWithHeaders do
+    use CSV.Schema
+
+    csv do
+      headers true
+    end
+
+    schema "test" do
+      field :a
+    end
+  end
+
+  describe "dump with headers set to 'true'" do
+    test "header is dumped" do
+      assert ["a\n", "1\n"] = dump(%ExampleWithHeaders{a: "1"})
+    end
+  end
+
+  defmodule ExampleWithoutHeaders do
+    use CSV.Schema
+
+    csv do
+      headers false
+    end
+
+    schema "test" do
+      field :a
+    end
+  end
+
+  describe "dump with headers set to 'false'" do
+    test "header is not dumped" do
+      assert ["1\n"] = dump(%ExampleWithoutHeaders{a: "1"})
     end
   end
 

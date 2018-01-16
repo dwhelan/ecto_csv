@@ -5,6 +5,37 @@ defmodule CSV.Schema do
     quote do
       import unquote(__MODULE__)
       use Ecto.Schema
+
+      Module.register_attribute(__MODULE__, :csv_headers, accumulate: false)
+      Module.put_attribute(__MODULE__, :csv_headers, true)
+    end
+  end
+
+  defmacro csv([do: block]) do
+    quote do
+      try do
+        # import CSV.Schema
+        unquote(block)
+      after
+        :ok
+      end
+      Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_headers)
+    end
+  end
+
+  defmacro headers(headers) do
+    quote do
+      CSV.Schema.__headers__(__MODULE__, unquote(headers))
+    end
+  end
+
+  def __headers__(mod, headers) do
+    Module.put_attribute(mod, :csv_headers, headers)
+  end
+
+  def __csv__(headers) do
+    quote do
+      def __csv__(:headers), do: unquote(headers)
     end
   end
 
