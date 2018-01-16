@@ -69,12 +69,6 @@ defmodule CSV.SchemaTest do
     end
   end
 
-  describe "__csv__" do
-    test "__csv__(:columns) should return a list of columns in order" do
-      assert CSV.SchemaTest.File.__csv__(:columns) == [:A, :a1, :a2, :a3, "B1", "B2", "B3"]
-    end
-  end
-
   describe "direct calls to Ecto.Schema should raise compilation errors" do
     test "schema 'name'" do
       assert_compile_error ~r{schema/2 imported from both Ecto.Schema and CSV.Schema}, 
