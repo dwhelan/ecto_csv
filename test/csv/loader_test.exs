@@ -19,7 +19,7 @@ defmodule CSV.LoaderTest do
     end
 
     test "values are converted to the defined data type" do
-      assert %Example{b: 1} = load_one(["b", "1"])
+      assert %Example{b: 2} = load_one(["a,b", "1,2"])
     end
 
     test "fields not defined in the schema are ignored" do
@@ -40,6 +40,24 @@ defmodule CSV.LoaderTest do
 
     test "double quotes are preserved in strings" do
       assert %{a: ~s{ "hi" there}} = load_one ["a,b,c", ~s{" ""hi"" there",2,3.45}]
+    end
+  end
+
+  defmodule ExampleWithoutHeaders do
+    use CSV.Schema
+
+    csv do
+      headers false
+    end
+
+    schema "test" do
+      field :a
+    end
+  end
+
+  describe "load with headers set to 'false'" do
+    test "that header is not loaded" do
+      assert %{a: "1"} = hd(CSV.Loader.load(["1"], ExampleWithoutHeaders) |> Enum.take(1))
     end
   end
 

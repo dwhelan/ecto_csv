@@ -1,20 +1,22 @@
 defmodule CSV.Loader do
   alias NimbleCSV.RFC4180, as: Parser
 
-  def load(path, schema) when is_binary(path) do
-    load(File.stream!(path), schema)
+  def load(path, mod) when is_binary(path) do
+    load(File.stream!(path), mod)
   end
 
-  def load(stream, schema) do
-    headers = headers(stream)
+  def load(stream, mod) do
+    _headers = stream_headers(stream)
+    headers = CSV.headers(mod)
 
+    stream = if CSV.has_headers?(mod), do: stream |> remove_header, else: stream
+    
     stream
-    |> remove_header
     |> to_values
-    |> to_struct(schema, headers)
+    |> to_struct(mod, headers)
   end
 
-  defp headers(stream) do
+  defp stream_headers(stream) do
     hd(Enum.take(stream |> to_values, 1))
   end
 
@@ -31,17 +33,17 @@ defmodule CSV.Loader do
     Parser.parse_stream(stream, headers: false)
   end
 
-  defp to_struct(stream, schema, headers) do
-    Stream.map(stream, &create_struct(&1, schema, headers))
+  defp to_struct(stream, mod, headers) do
+    Stream.map(stream, &create_struct(&1, mod, headers))
   end
 
-  defp create_struct(values, schema, headers) do
-    Enum.zip(headers, values) |> Enum.reduce(struct(schema), &set_struct_value(&1, &2, schema))
+  defp create_struct(values, mod, headers) do
+    Enum.zip(headers, values) |> Enum.reduce(struct(mod), &set_struct_value(&1, &2, mod))
   end
 
-  defp set_struct_value({name, value}, struct, schema) do
+  defp set_struct_value({name, value}, struct, mod) do
     field = String.to_atom(name)
-    value = CSV.Schema.cast(schema, field, value)
+    value = CSV.Schema.cast(mod, field, value)
     struct(struct, Keyword.new([{field, value}]))
   end
 end
