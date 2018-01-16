@@ -1,6 +1,6 @@
-defmodule Transform.EctoStructTest do
+defmodule Transform.EctoMapTest do
   use ExUnit.Case
-  alias Transform.Struct
+  alias Transform.Map
 
   defmodule Example do
     use CSV.Schema
@@ -25,7 +25,7 @@ defmodule Transform.EctoStructTest do
   describe "mapping" do
     test "foo" do
       input = %Example{a: "123"}
-      output = Struct.cast(input, Result)
+      output = Map.cast(input, Result)
       assert %Result{a: "123"} = output
     end
   end

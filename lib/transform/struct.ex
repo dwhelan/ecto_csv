@@ -1,24 +1,25 @@
-defmodule Transform.Struct do
-  def cast(map, mod) do
-    Map.keys(map)
+defmodule Transform.Map do
+  def cast(source, mod) do
+    Map.keys(source)
     |> remove_meta_keys
-    |> copy_values(map, mod)
+    |> copy_values(source, mod)
   end
 
   @does_not_start_with__ ~r/^(?!__).+/
+
   defp remove_meta_keys(keys) do
     Enum.filter(keys, &Regex.match?(@does_not_start_with__, Atom.to_string(&1))) 
   end
 
-  defp copy_values(keys, map, mod) when is_atom(mod) do
-    copy_values(keys, map, struct(mod))
+  defp copy_values(keys, source, mod) when is_atom(mod) do
+    copy_values(keys, source, struct(mod))
   end
 
-  defp copy_values(keys, map, other_map) do
-    Enum.reduce(keys, other_map, &copy_value(&1, &2, map))
+  defp copy_values(keys, source, target) do
+    Enum.reduce(keys, target, &copy_value(&1, source, &2))
   end
 
-  defp copy_value(key, other_map, map) do
-    Map.put(other_map, key, Map.get(map, key))
+  defp copy_value(key, source, target) do
+    Map.put(target, key, Map.get(source, key))
   end
 end
