@@ -12,7 +12,7 @@ defmodule CSV.Dumper do
   end
 
   defp to_values(stream) do
-    Stream.transform(stream, 0, fn struct, index -> { row_values(struct, index), index + 1 } end )
+    Stream.transform(stream, 0, fn struct, index -> {row_values(struct, index), index + 1} end )
   end
 
   defp to_csv(stream) do
@@ -21,15 +21,14 @@ defmodule CSV.Dumper do
     |> Stream.map(&IO.iodata_to_binary(&1))
   end
 
-  defp row_values(struct, 0) do
-    [header_values(struct) | row_values(struct, 1)]
+  defp row_values(struct, index) do
+    case index do
+      0 -> [header_values(struct), row_values(struct)]
+      _ -> [row_values(struct)]
+    end
   end
 
-  defp row_values(struct, _) do
-    [struct_to_values(struct)]
-  end
-
-  defp struct_to_values(struct) do
+  defp row_values(struct) do
     Enum.map(header_values(struct), &struct_value(struct, &1))
   end
 
