@@ -23,10 +23,8 @@ defmodule Transform.EctoMapTest do
   end
 
   describe "mapping" do
-    test "foo" do
-      input = %Example{a: "123"}
-      output = Map.cast(input, Result)
-      assert %Result{a: "123"} = output
+    test "struct to struct" do
+      assert %Result{a: "123"} = %Example{a: "123"} |> Map.cast(Result)
     end
   end
 end
