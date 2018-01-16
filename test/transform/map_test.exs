@@ -29,4 +29,8 @@ defmodule Transform.StructTest do
       assert %{a: "a", b: 42, c: false} = %{a: "a", b: 42, c: false} |> Map.cast(%{})
     end
   end
+
+  test "should default to creating a target map" do
+    assert %{a: "a", b: 42, c: false} = %{a: "a", b: 42, c: false} |> Map.cast
+  end
 end
