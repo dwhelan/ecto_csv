@@ -43,12 +43,12 @@ defmodule CSV.LoaderTest do
     end
   end
 
-  
+
   defmodule ExampleWithoutHeaders do
     use CSV.Schema
 
     csv do
-      headers false
+      header false
     end
 
     schema "test" do

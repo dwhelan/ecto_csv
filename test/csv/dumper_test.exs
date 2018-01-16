@@ -39,7 +39,7 @@ defmodule CSV.DumperTest do
     use CSV.Schema
 
     csv do
-      headers true
+      header true
     end
 
     schema "test" do
@@ -57,7 +57,7 @@ defmodule CSV.DumperTest do
     use CSV.Schema
 
     csv do
-      headers false
+      header false
     end
 
     schema "test" do
