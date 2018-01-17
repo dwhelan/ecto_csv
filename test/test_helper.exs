@@ -29,4 +29,8 @@ defmodule TestFile do
     File.write!(path, content)
     path
   end
+
+  def create_pair(content \\ "") do
+    {create(content), create()}
+  end
 end

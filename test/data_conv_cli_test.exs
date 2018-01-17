@@ -10,6 +10,7 @@ defmodule DataConv.CLITest do
     assert_raise RuntimeError, fn -> DataConv.CLI.main ["input"] end
   end
 
+  @tag :skip
   test "main [input, output] should process the file" do
     DataConv.CLI.main ["test/files/simple.csv", "test/files/out.csv"]
   end

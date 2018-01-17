@@ -1,7 +1,6 @@
 defmodule EctoCSV.Loader do
   alias NimbleCSV.RFC4180, as: Parser
 
-  
   def load(path, mod) when is_binary(path) do
     load(File.stream!(path), mod)
   end
@@ -24,8 +23,8 @@ defmodule EctoCSV.Loader do
   defp remove_header(stream) do
     Stream.transform(stream, 0, fn struct, index -> 
       case index do
-        0 -> {[],       :_}
-        _ -> {[struct], :_}
+        0 -> {[],       :ignore_header}
+        _ -> {[struct], :process_stream}
       end
     end)
   end
