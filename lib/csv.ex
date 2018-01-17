@@ -14,7 +14,7 @@ defmodule CSV do
   end
 
   def headers(mod) when is_atom(mod) do
-    mod.__schema__(:fields) |> Enum.filter(&(&1 != :id))
+    mod.__csv__(:headers)
   end
 
   def headers(struct) do

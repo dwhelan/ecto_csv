@@ -6,12 +6,18 @@ defmodule CSV.Schema do
       use Ecto.Schema
 
       Module.put_attribute(__MODULE__, :csv_header, true)
-    end
+   end
   end
 
   defmacro csv(do: block) do
     quote do
       unquote(block)
+      Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_header)
+    end
+  end
+
+  defmacro csv do
+    quote do
       Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_header)
     end
   end

@@ -10,7 +10,7 @@ defmodule CSV.SchemaTest do
       field :c
     end
 
-    csv do end
+    csv()
   end
 
   describe "with empty csv block" do

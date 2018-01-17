@@ -11,6 +11,8 @@ defmodule CSV.LoaderTest do
       field :b, :integer
       field :c, :float
     end
+
+    csv()
   end
 
   describe "load from stream" do

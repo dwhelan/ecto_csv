@@ -9,6 +9,8 @@ defmodule CSV.DumperTest do
       field :b, :integer
       field :c, :float
     end
+
+    csv()
   end
 
   describe "dump" do
