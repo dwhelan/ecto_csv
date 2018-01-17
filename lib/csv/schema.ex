@@ -20,7 +20,7 @@ defmodule CSV.Schema do
     quote do
       def __csv__(:header),           do: unquote(header)
       def __csv__(:file_has_header?), do: unquote(header != false)
-      def __csv__(:headers),          do: Module.eval_quoted __ENV__, Ecto.Schema.__schema__(:fields) |> Enum.filter(&(&1 != :id))
+      def __csv__(:headers),          do: __MODULE__.__schema__(:fields) |> Enum.filter(&(&1 != :id))
     end
   end
 

@@ -1,19 +1,29 @@
 defmodule CSV.SchemaTest do
   use ExUnit.Case
 
-  defmodule File do
+  defmodule Example do
     use CSV.Schema
 
     schema "test" do
-      field :A
-      field :a1
-      field :a2, :integer
-      field :a3, :integer, opt: "value"
+      field :a
+      field :b
+      field :c
     end
+
+    csv do end
   end
 
-  describe "that field names" do
-    test "should support upper case atoms" do
+  describe "with empty csv block" do
+    test "'file_has_header?'' should be 'true'" do
+      assert Example.__csv__(:file_has_header?) == true
+    end  
+
+    test "'header' should be 'true'" do
+      assert Example.__csv__(:file_has_header?) == true
+    end  
+
+    test "'headers' should be set from fields'" do
+      assert Example.__csv__(:headers) == [:a, :b, :c]
     end  
   end
 end
