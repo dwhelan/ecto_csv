@@ -1,10 +1,10 @@
-defmodule CSV.LoaderTest do
+defmodule EctoCSV.LoaderTest do
   require Briefly
 
   use ExUnit.Case
   
   defmodule Example do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -46,7 +46,7 @@ defmodule CSV.LoaderTest do
   end
 
   defmodule ExampleWithHeaders do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -59,12 +59,12 @@ defmodule CSV.LoaderTest do
 
   describe "load with headers set to 'true'" do
     test "that header is loaded" do
-      assert %{a: "1"} = hd(CSV.Loader.load(["a", "1"], ExampleWithHeaders) |> Enum.take(1))
+      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], ExampleWithHeaders) |> Enum.take(1))
     end
   end
 
   defmodule ExampleWithoutHeaders do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -77,7 +77,7 @@ defmodule CSV.LoaderTest do
 
   describe "load with headers set to 'false'" do
     test "that header is not loaded" do
-      assert %{a: "1"} = hd(CSV.Loader.load(["1"], ExampleWithoutHeaders) |> Enum.take(1))
+      assert %{a: "1"} = hd(EctoCSV.Loader.load(["1"], ExampleWithoutHeaders) |> Enum.take(1))
     end
   end
 
@@ -100,6 +100,6 @@ defmodule CSV.LoaderTest do
   end
   
   defp load(lines) do
-    CSV.Loader.load(lines, Example)
+    EctoCSV.Loader.load(lines, Example)
   end
 end

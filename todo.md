@@ -1,4 +1,4 @@
-# CSV
+# EctoCSV
 * handle header row with blank cells (allow code to specify name or field number)
 * rename to EctoCSV
 * loader
@@ -19,7 +19,7 @@
     * create lists of fields to export from schema (e.g.  @csv dump: [except: :id])
 * records
     * allow structs to have additional data (via Map.update() but struct access won't work)
-* CSV schema - can csv behaviour be treated as an extension to schema?
+* EctoCSV schema - can csv behaviour be treated as an extension to schema?
     * use plain ecto schema macros and functions
     * add csv specific macros
 

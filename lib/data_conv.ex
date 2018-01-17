@@ -1,5 +1,5 @@
 
-defmodule Inbox.CSV do
+defmodule Inbox.EctoCSV do
   defmodule Parser do
     @callback parse(Stream.t) :: Stream.t
   end
@@ -9,18 +9,18 @@ defmodule Inbox.CSV do
   end
 end
 
-defmodule Inbox.CSV.RFC4180 do
-  @behaviour Inbox.CSV.Parser
-  @behaviour Inbox.CSV.Formatter
+defmodule Inbox.EctoCSV.RFC4180 do
+  @behaviour Inbox.EctoCSV.Parser
+  @behaviour Inbox.EctoCSV.Formatter
 
-  alias NimbleCSV.RFC4180, as: CSV
+  alias NimbleCSV.RFC4180, as: EctoCSV
 
   def parse(stream) do
-    CSV.parse_stream(stream, headers: false)
+    EctoCSV.parse_stream(stream, headers: false)
   end
 
   def format(stream) do
-    CSV.dump_to_stream(stream)
+    EctoCSV.dump_to_stream(stream)
   end
 end
 
@@ -50,7 +50,7 @@ defmodule DataConv do
   end
 
   defp parse(stream) do
-    Inbox.CSV.RFC4180.parse(stream)
+    Inbox.EctoCSV.RFC4180.parse(stream)
   end
 
   defp map_input(row) do
@@ -66,7 +66,7 @@ defmodule DataConv do
   end
 
   def format(stream) do
-    Inbox.CSV.RFC4180.format(stream)
+    Inbox.EctoCSV.RFC4180.format(stream)
   end
 
   def output(stream, output_stream) do

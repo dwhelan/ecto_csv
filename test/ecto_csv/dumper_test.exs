@@ -1,8 +1,8 @@
-defmodule CSV.DumperTest do
+defmodule EctoCSV.DumperTest do
   use ExUnit.Case
 
   defmodule Example do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -32,13 +32,13 @@ defmodule CSV.DumperTest do
 
     test "that records can be dumped to files" do
       path = TestFile.create();
-      CSV.Dumper.dump([%Example{a: "hi", b: 2, c: 3.4}, %Example{a: "there", b: 5, c: 6.7}], path)
+      EctoCSV.Dumper.dump([%Example{a: "hi", b: 2, c: 3.4}, %Example{a: "there", b: 5, c: 6.7}], path)
       assert {:ok, "a,b,c\nhi,2,3.4\nthere,5,6.7\n"} = File.read(path)
     end
   end
 
   defmodule ExampleWithHeaders do
-    use CSV.Schema
+    use EctoCSV.Schema
     
     schema "test" do
       field :a
@@ -56,7 +56,7 @@ defmodule CSV.DumperTest do
   end
 
   defmodule ExampleWithoutHeaders do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -74,6 +74,6 @@ defmodule CSV.DumperTest do
   end
 
   defp dump(lines) do
-    CSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
+    EctoCSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
   end
 end

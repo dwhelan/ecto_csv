@@ -1,4 +1,4 @@
-defmodule CSV.Transform do
+defmodule EctoCSV.Transform do
   require Invoke
 
   def transform(value, transforms \\ [], options \\ %{}) do

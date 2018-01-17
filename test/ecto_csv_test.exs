@@ -1,8 +1,8 @@
-defmodule CSVTest do
+defmodule EctoCSVTest do
   use ExUnit.Case
 
   defmodule File do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :A
@@ -43,14 +43,14 @@ defmodule CSVTest do
   end
 
   defp load(field, value) do
-    CSV.load(CSVTest.File, field, value)
+    EctoCSV.load(EctoCSVTest.File, field, value)
   end
 
   defp cast(field, value) do
-    CSV.cast(CSVTest.File, field, value)
+    EctoCSV.cast(EctoCSVTest.File, field, value)
   end
 
   defp dump(field, value) do
-    CSV.dump(CSVTest.File, field, value)
+    EctoCSV.dump(EctoCSVTest.File, field, value)
   end
 end

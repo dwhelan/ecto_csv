@@ -3,7 +3,7 @@ defmodule Transform.EctoMapTest do
   alias Transform.Map
 
   defmodule Example do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -13,7 +13,7 @@ defmodule Transform.EctoMapTest do
   end
 
   defmodule Result do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a, :string

@@ -1,8 +1,8 @@
-defmodule CSV.SchemaTest do
+defmodule EctoCSV.SchemaTest do
   use ExUnit.Case
 
   defmodule Example do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -28,7 +28,7 @@ defmodule CSV.SchemaTest do
   end
 
   defmodule Example2 do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a
@@ -56,7 +56,7 @@ defmodule CSV.SchemaTest do
   end
 
   defmodule Example3 do
-    use CSV.Schema
+    use EctoCSV.Schema
 
     schema "test" do
       field :a

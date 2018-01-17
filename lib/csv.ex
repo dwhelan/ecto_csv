@@ -1,4 +1,4 @@
-defmodule CSV do
+defmodule EctoCSV do
   alias Ecto.Type
 
   def file_has_header?(mod) when is_atom(mod) do

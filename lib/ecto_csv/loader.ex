@@ -1,15 +1,16 @@
-defmodule CSV.Loader do
+defmodule EctoCSV.Loader do
   alias NimbleCSV.RFC4180, as: Parser
 
+  
   def load(path, mod) when is_binary(path) do
     load(File.stream!(path), mod)
   end
 
   def load(stream, mod) do
     _headers = stream_headers(stream)
-    headers = CSV.headers(mod)
+    headers = EctoCSV.headers(mod)
 
-    stream = if CSV.file_has_header?(mod), do: stream |> remove_header, else: stream
+    stream = if EctoCSV.file_has_header?(mod), do: stream |> remove_header, else: stream
     
     stream
     |> to_values
@@ -42,7 +43,7 @@ defmodule CSV.Loader do
   end
 
   defp set_struct_value({field, value}, struct, mod) do
-    {:ok, value} = CSV.cast(mod, field, value)
+    {:ok, value} = EctoCSV.cast(mod, field, value)
     struct(struct, Keyword.new([{field, value}]))
   end
 end

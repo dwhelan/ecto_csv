@@ -1,6 +1,6 @@
-defmodule CSV.TransformTest do
+defmodule EctoCSV.TransformTest do
   use ExUnit.Case
-  require CSV.Transform, as: Transform
+  require EctoCSV.Transform, as: Transform
 
   def integer(string) do
     String.to_integer(string)
@@ -12,49 +12,49 @@ defmodule CSV.TransformTest do
 
   describe "module" do
     test "as a Module" do
-      assert Transform.transform("123", {CSV.TransformTest, :integer}) === {:ok, 123}
+      assert Transform.transform("123", {EctoCSV.TransformTest, :integer}) === {:ok, 123}
     end
 
     test "as a String" do
-      assert Transform.transform("123", {"CSV.TransformTest", :integer}) === {:ok, 123}
+      assert Transform.transform("123", {"EctoCSV.TransformTest", :integer}) === {:ok, 123}
     end
 
     test "as an Atom" do
-      assert Transform.transform("123", {:"CSV.TransformTest", :integer}) === {:ok, 123}
+      assert Transform.transform("123", {:"EctoCSV.TransformTest", :integer}) === {:ok, 123}
     end
 
     test "as the first module in options[:module]" do
-      assert Transform.transform("123", :integer, module: [CSV.TransformTest, String]) === {:ok, 123}
+      assert Transform.transform("123", :integer, module: [EctoCSV.TransformTest, String]) === {:ok, 123}
     end
 
     test "as the last module in options[:module]" do
-      assert Transform.transform("123", :integer, module: [String, CSV.TransformTest]) === {:ok, 123}
+      assert Transform.transform("123", :integer, module: [String, EctoCSV.TransformTest]) === {:ok, 123}
     end
 
     test "as the only module in options[:module]" do
-      assert Transform.transform("123", :integer, module: [CSV.TransformTest]) === {:ok, 123}
+      assert Transform.transform("123", :integer, module: [EctoCSV.TransformTest]) === {:ok, 123}
     end
 
     test "as the options[:module]" do
-      assert Transform.transform("123", :integer, module: CSV.TransformTest) === {:ok, 123}
+      assert Transform.transform("123", :integer, module: EctoCSV.TransformTest) === {:ok, 123}
     end
   end
 
   describe "function" do
     test "as a String" do
-      assert Transform.transform("123", {CSV.TransformTest, "integer"}) === {:ok, 123}
+      assert Transform.transform("123", {EctoCSV.TransformTest, "integer"}) === {:ok, 123}
     end
 
     test "as an Atom" do
-      assert Transform.transform("123", {CSV.TransformTest, :integer}) === {:ok, 123}
+      assert Transform.transform("123", {EctoCSV.TransformTest, :integer}) === {:ok, 123}
     end
 
     test "as a String that includes module name" do
-      assert Transform.transform("123", "CSV.TransformTest.integer") === {:ok, 123}
+      assert Transform.transform("123", "EctoCSV.TransformTest.integer") === {:ok, 123}
     end
 
     test "as an Atom that includes module name" do
-      assert Transform.transform("123", :"CSV.TransformTest.integer") === {:ok, 123}
+      assert Transform.transform("123", :"EctoCSV.TransformTest.integer") === {:ok, 123}
     end
 
     test "as a lambda to a named function" do
@@ -93,8 +93,8 @@ defmodule CSV.TransformTest do
     end
   
     test "with error without message() function" do
-      integer = &(raise CSV.TransformTest.ErrorWithoutMessage, value: &1)
-      assert Transform.transform("123", integer) === {:error, "%CSV.TransformTest.ErrorWithoutMessage{value: \"123\"}"}
+      integer = &(raise EctoCSV.TransformTest.ErrorWithoutMessage, value: &1)
+      assert Transform.transform("123", integer) === {:error, "%EctoCSV.TransformTest.ErrorWithoutMessage{value: \"123\"}"}
     end
   end
 

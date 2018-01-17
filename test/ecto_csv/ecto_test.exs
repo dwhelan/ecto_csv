@@ -1,4 +1,4 @@
-defmodule CSV.EctoTest do
+defmodule EctoCSV.EctoTest do
   use Ecto.Schema
   use ExUnit.Case
 
@@ -14,7 +14,7 @@ defmodule CSV.EctoTest do
     end
     
     test "has an value of 'nil'" do
-      assert %CSV.EctoTest{}.name == nil
+      assert %EctoCSV.EctoTest{}.name == nil
     end    
   end
 
@@ -24,7 +24,7 @@ defmodule CSV.EctoTest do
     end
     
     test "has an value of 'nil'" do
-      assert %CSV.EctoTest{}.married == nil
+      assert %EctoCSV.EctoTest{}.married == nil
     end    
   end
 
@@ -34,7 +34,7 @@ defmodule CSV.EctoTest do
     end
     
     test "has an initial value from the :default option" do
-      assert %CSV.EctoTest{}.age == 18
+      assert %EctoCSV.EctoTest{}.age == 18
     end    
   end
 

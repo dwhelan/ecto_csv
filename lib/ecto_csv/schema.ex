@@ -1,4 +1,4 @@
-defmodule CSV.Schema do
+defmodule EctoCSV.Schema do
 
   defmacro __using__(_opts) do
     quote do
@@ -12,13 +12,13 @@ defmodule CSV.Schema do
   defmacro csv(do: block) do
     quote do
       unquote(block)
-      Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_header)
+      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header)
     end
   end
 
   defmacro csv do
     quote do
-      Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_header)
+      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header)
     end
   end
 
@@ -32,7 +32,7 @@ defmodule CSV.Schema do
 
   defmacro header(header) do
     quote do
-      CSV.Schema.__header__(__MODULE__, unquote(header))
+      EctoCSV.Schema.__header__(__MODULE__, unquote(header))
     end
   end
 

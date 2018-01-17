@@ -1,4 +1,4 @@
-defmodule CSV.Dumper do
+defmodule EctoCSV.Dumper do
   alias NimbleCSV.RFC4180, as: Formatter
 
   def dump(stream, path) do
@@ -22,15 +22,15 @@ defmodule CSV.Dumper do
   end
 
   defp row_values(struct, index) do
-    if index == 0 && CSV.file_has_header?(struct) do
-      [CSV.headers(struct), row_values(struct)]
+    if index == 0 && EctoCSV.file_has_header?(struct) do
+      [EctoCSV.headers(struct), row_values(struct)]
     else
       [row_values(struct)]
     end
   end
 
   defp row_values(struct) do
-    Enum.map(CSV.headers(struct), &struct_value(struct, &1))
+    Enum.map(EctoCSV.headers(struct), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do
