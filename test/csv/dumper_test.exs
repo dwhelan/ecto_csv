@@ -37,13 +37,13 @@ defmodule CSV.DumperTest do
 
   defmodule ExampleWithHeaders do
     use CSV.Schema
+    
+    schema "test" do
+      field :a
+    end
 
     csv do
       header true
-    end
-
-    schema "test" do
-      field :a
     end
   end
 
@@ -56,12 +56,12 @@ defmodule CSV.DumperTest do
   defmodule ExampleWithoutHeaders do
     use CSV.Schema
 
-    csv do
-      header false
-    end
-
     schema "test" do
       field :a
+    end
+
+    csv do
+      header false
     end
   end
 

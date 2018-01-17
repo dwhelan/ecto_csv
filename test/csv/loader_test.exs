@@ -43,16 +43,33 @@ defmodule CSV.LoaderTest do
     end
   end
 
+  defmodule ExampleWithHeaders do
+    use CSV.Schema
+
+    schema "test" do
+      field :a
+    end
+
+    csv do
+      header true
+    end
+  end
+
+  describe "load with headers set to 'true'" do
+    test "that header is loaded" do
+      assert %{a: "1"} = hd(CSV.Loader.load(["a", "1"], ExampleWithHeaders) |> Enum.take(1))
+    end
+  end
 
   defmodule ExampleWithoutHeaders do
     use CSV.Schema
 
-    csv do
-      header false
-    end
-
     schema "test" do
       field :a
+    end
+
+    csv do
+      header false
     end
   end
 
