@@ -6,19 +6,22 @@ defmodule CSV.Schema do
       import unquote(__MODULE__)
       use Ecto.Schema
 
-      Module.register_attribute(__MODULE__, :csv_header, accumulate: false)
       Module.put_attribute(__MODULE__, :csv_header, true)
     end
   end
 
-  defmacro csv([do: block]) do
+  defmacro csv(do: block) do
     quote do
-      try do
-        unquote(block)
-      after
-        :ok
-      end
+      unquote(block)
       Module.eval_quoted __ENV__, CSV.Schema.__csv__(@csv_header)
+    end
+  end
+
+  def __csv__(header) do
+    quote do
+      def __csv__(:header),           do: unquote(header)
+      def __csv__(:file_has_header?), do: unquote(header != false)
+      def __csv__(:headers),          do: Module.eval_quoted __ENV__, Ecto.Schema.__schema__(:fields) |> Enum.filter(&(&1 != :id))
     end
   end
 
@@ -32,30 +35,17 @@ defmodule CSV.Schema do
     Module.put_attribute(mod, :csv_header, header)
   end
 
-  def __csv__(header) do
-    quote do
-      def __csv__(:header),           do: unquote(header)
-      def __csv__(:file_has_header?), do: unquote(header != false)
-    end
-  end
-
-  def cast(schema, field, string) do
-    case type = type(schema, field) do
-      nil -> string
-      _   -> {:ok, value} = Type.cast(type, string)
-             value
-    end
+  def cast(schema, field, value) do
+    {:ok, value} = type(schema, field) |> Type.cast(value)
+    value
   end
 
   def dump(schema, field, value) do
-    case type = type(schema, field) do
-      nil -> value
-      _   -> {:ok, value} = Type.dump(type, value)
-             value
-    end
+    {:ok, value} = type(schema, field) |> Type.dump(value)
+    value
   end
 
-  def type(schema, field) do
-    schema.__schema__(:type, field)
+  defp type(schema, field) do
+    schema.__schema__(:type, field) || :string
   end
 end
