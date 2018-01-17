@@ -21,10 +21,6 @@ defmodule CSV do
     headers(struct.__struct__)
   end
 
-  def __header__(mod, header) do
-    Module.put_attribute(mod, :csv_header, header)
-  end
-
   def load(mod, field, value) do
     type(mod, field) |> Type.load(value)
   end
