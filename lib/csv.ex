@@ -1,4 +1,6 @@
 defmodule CSV do
+  alias Ecto.Type
+
   def file_has_header?(mod) when is_atom(mod) do
     if Keyword.has_key?(mod.__info__(:functions), :__csv__) do
       mod.__csv__(:file_has_header?)
@@ -12,11 +14,30 @@ defmodule CSV do
   end
 
   def headers(mod) when is_atom(mod) do
-    mod.__schema__(:fields)
-    |> Enum.filter(&(&1 != :id))
+    mod.__schema__(:fields) |> Enum.filter(&(&1 != :id))
   end
 
   def headers(struct) do
     headers(struct.__struct__)
+  end
+
+  def __header__(mod, header) do
+    Module.put_attribute(mod, :csv_header, header)
+  end
+
+  def load(mod, field, value) do
+    type(mod, field) |> Type.load(value)
+  end
+
+  def cast(mod, field, value) do
+    type(mod, field) |> Type.cast(value)
+  end
+
+  def dump(mod, field, value) do
+    type(mod, field) |> Type.dump(value)
+  end
+
+  defp type(mod, field) do
+    mod.__schema__(:type, field) || :string
   end
 end

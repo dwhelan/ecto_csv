@@ -1,5 +1,4 @@
 defmodule CSV.Schema do
-  alias Ecto.Type
 
   defmacro __using__(_opts) do
     quote do
@@ -33,19 +32,5 @@ defmodule CSV.Schema do
 
   def __header__(mod, header) do
     Module.put_attribute(mod, :csv_header, header)
-  end
-
-  def cast(schema, field, value) do
-    {:ok, value} = type(schema, field) |> Type.cast(value)
-    value
-  end
-
-  def dump(schema, field, value) do
-    {:ok, value} = type(schema, field) |> Type.dump(value)
-    value
-  end
-
-  defp type(schema, field) do
-    schema.__schema__(:type, field) || :string
   end
 end

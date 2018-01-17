@@ -42,7 +42,7 @@ defmodule CSV.Loader do
   end
 
   defp set_struct_value({field, value}, struct, mod) do
-    value = CSV.Schema.cast(mod, field, value)
+    {:ok, value} = CSV.cast(mod, field, value)
     struct(struct, Keyword.new([{field, value}]))
   end
 end
