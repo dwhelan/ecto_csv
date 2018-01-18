@@ -14,13 +14,13 @@ defmodule DataConv.Test do
   end
 
   test "streaming: input csv -> process -> ouptut should retain data" do
-    input  = ["a,b,c\n", "a,1,2.3\n", "b,4,5.6\n"]
+    input  = ["a,b,c\n", "d,1,2.3\n", "e,4,5.6\n"]
     output = DataConv.process(input, Source) |> Enum.to_list
     assert output == input
   end
 
   test "file: input csv -> process -> ouptut should retain data" do
-    input = "a,b,c\na,1,2.3\nb,4,5.6\n"
+    input = "a,b,c\nd,1,2.3\ne,4,5.6\n"
     {source, destination} = TestFile.create_pair(input);
     DataConv.process(source, destination, Source)
     {:ok, output} = File.read(destination)

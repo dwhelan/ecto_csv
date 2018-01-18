@@ -1,4 +1,4 @@
-defmodule EctoCSV.SchemaTest do
+defmodule EctoCSV.Ideas do
   use ExUnit.Case
 
   defmodule Example do
@@ -10,7 +10,8 @@ defmodule EctoCSV.SchemaTest do
       field :c
     end
 
-    csv()
+    csv do
+    end
   end
 
   describe "with empty csv block" do
@@ -35,6 +36,7 @@ defmodule EctoCSV.SchemaTest do
       field :b
       field :c
     end
+    
 
     csv do
       header true

@@ -2,14 +2,13 @@ defmodule DataConv do
   alias EctoCSV.Loader
   alias EctoCSV.Dumper
 
-  def process(input, destination, schema) when is_binary(input) do
-    Loader.load(input, schema)
-    |> Dumper.dump(destination)
+  def process(path, destination, schema) when is_binary(path) do
+    Loader.load(path, schema) |> Dumper.dump(destination)
+    Loader.load(path, schema) |> PostGres.dump(destination)
   end
 
-  def process(input, schema) do
-    Loader.load(input, schema)
-    |> Dumper.dump
+  def process(stream, schema) do
+    Loader.load(stream, schema) |> Dumper.dump
   end
 end
 
