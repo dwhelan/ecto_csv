@@ -4,7 +4,6 @@ defmodule DataConv do
 
   def process(path, destination, schema) when is_binary(path) do
     Loader.load(path, schema) |> Dumper.dump(destination)
-    Loader.load(path, schema) |> PostGres.dump(destination)
   end
 
   def process(stream, schema) do
