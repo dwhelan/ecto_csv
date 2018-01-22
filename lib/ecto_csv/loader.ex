@@ -1,19 +1,32 @@
 defmodule EctoCSV.Loader do
   alias NimbleCSV.RFC4180, as: Parser
 
-  def load(path, mod) when is_binary(path) do
-    load(File.stream!(path), mod)
+  @moduledoc """
+  Loads CSV data using an `Ecto.Schema` to describe the data.
+
+  The data must be compliant with [RFC4180](https://tools.ietf.org/html/rfc4180).
+  """
+
+  @doc """
+  Load CSV data from the file at `path` returning a stream of structs as defined by the `schema`.
+  """
+  def load(path, schema) when is_binary(path) do
+    load(File.stream!(path), schema)
   end
 
-  def load(stream, mod) do
-    _headers = stream_headers(stream)
-    headers = EctoCSV.headers(mod)
+  @doc """
+  Load CSV data from the `stream` returning a stream of structs as defined by the `schema`.
 
-    stream = if EctoCSV.file_has_header?(mod), do: stream |> remove_header, else: stream
+  """
+  def load(stream, schema) do
+    _headers = stream_headers(stream)
+    headers = EctoCSV.headers(schema)
+
+    stream = if EctoCSV.file_has_header?(schema), do: stream |> remove_header, else: stream
     
     stream
     |> to_values
-    |> to_struct(mod, headers)
+    |> to_struct(schema, headers)
   end
 
   defp stream_headers(stream) do
@@ -33,16 +46,16 @@ defmodule EctoCSV.Loader do
     Parser.parse_stream(stream, headers: false)
   end
 
-  defp to_struct(stream, mod, headers) do
-    Stream.map(stream, &create_struct(&1, mod, headers))
+  defp to_struct(stream, schema, headers) do
+    Stream.map(stream, &create_struct(&1, schema, headers))
   end
 
-  defp create_struct(values, mod, headers) do
-    Enum.zip(headers, values) |> Enum.reduce(struct(mod), &set_struct_value(&1, &2, mod))
+  defp create_struct(values, schema, headers) do
+    Enum.zip(headers, values) |> Enum.reduce(struct(schema), &set_struct_value(&1, &2, schema))
   end
 
-  defp set_struct_value({field, value}, struct, mod) do
-    {:ok, value} = EctoCSV.cast(mod, field, value)
+  defp set_struct_value({field, value}, struct, schema) do
+    {:ok, value} = EctoCSV.cast(schema, field, value)
     struct(struct, Keyword.new([{field, value}]))
   end
 end

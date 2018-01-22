@@ -1,9 +1,9 @@
 defmodule EctoCSV do
   alias Ecto.Type
 
-  def file_has_header?(mod) when is_atom(mod) do
-    if Keyword.has_key?(mod.__info__(:functions), :__csv__) do
-      mod.__csv__(:file_has_header?)
+  def file_has_header?(schema) when is_atom(schema) do
+    if Keyword.has_key?(schema.__info__(:functions), :__csv__) do
+      schema.__csv__(:file_has_header?)
     else
       true
     end
@@ -13,27 +13,27 @@ defmodule EctoCSV do
     file_has_header?(struct.__struct__)
   end
 
-  def headers(mod) when is_atom(mod) do
-    mod.__csv__(:headers)
+  def headers(schema) when is_atom(schema) do
+    schema.__csv__(:headers)
   end
 
   def headers(struct) do
     headers(struct.__struct__)
   end
 
-  def load(mod, field, value) do
-    type(mod, field) |> Type.load(value)
+  def load(schema, field, value) do
+    type(schema, field) |> Type.load(value)
   end
 
-  def cast(mod, field, value) do
-    type(mod, field) |> Type.cast(value)
+  def cast(schema, field, value) do
+    type(schema, field) |> Type.cast(value)
   end
 
-  def dump(mod, field, value) do
-    type(mod, field) |> Type.dump(value)
+  def dump(schema, field, value) do
+    type(schema, field) |> Type.dump(value)
   end
 
-  defp type(mod, field) do
-    mod.__schema__(:type, field) || :string
+  defp type(schema, field) do
+    schema.__schema__(:type, field) || :string
   end
 end
