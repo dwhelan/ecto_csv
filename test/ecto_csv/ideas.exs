@@ -17,12 +17,12 @@ defmodule EctoCSV.Ideas do
 
       # Supplier headers are compared against schema fields
       # Validations will allow the listed rules.
-      # You can list a single value or a list.
+      # You can provide a single value or a list.
       header allow: [
-        :extra,
-        :missing,
-        :whitespace,
-        :case,
+        :extra_columns,
+        :missing_columns,
+        :whitespace_differences,
+        :case_differences,
         :all,
         :none
       ]
