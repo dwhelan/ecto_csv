@@ -1,4 +1,10 @@
-ExUnit.start(exclude: [:skip, :wip])
+includes = []
+excludes = [:wip, :skip]
+
+# Uncomment the line below to enable focus mode
+# includes = [:focus | includes]; excludes = [:test | excludes]
+
+ExUnit.start(include: includes, exclude: excludes)
 
 # From https://gist.github.com/henrik/1054546364ac68da4102
 defmodule CompileTimeAssertions do
