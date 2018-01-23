@@ -1,5 +1,4 @@
 defmodule EctoCSV.Loader.DelimiterTest do
-  require Briefly
   use ExUnit.Case
   
   defmodule Example do

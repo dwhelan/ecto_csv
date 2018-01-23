@@ -20,6 +20,7 @@ defmodule EctoCSV.Mixfile do
   defp deps do
     [
       {:briefly,         "~> 0.3", only: :test},
+      {:csv,             "~> 2.0"},
       {:ecto,            "~> 2.1"},
       {:mix_test_watch,  "~> 0.5", only: :dev},
       {:nimble_csv,      "~> 0.3"},

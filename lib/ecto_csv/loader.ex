@@ -1,5 +1,6 @@
 defmodule EctoCSV.Loader do
   alias EctoCSV.Adapters.Nimble
+  alias EctoCSV.Adapters.CSV
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -19,18 +20,25 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
-    _headers = stream_headers(stream)
+    _headers = stream_headers(stream, schema)
     headers = EctoCSV.headers(schema)
 
-    stream = if EctoCSV.file_has_header?(schema), do: stream |> remove_header, else: stream
-    
     stream
-    |> to_values
+    |> maybe_remove_header(schema)
+    |> decode(schema)
     |> to_struct(schema, headers)
   end
 
-  defp stream_headers(stream) do
-    hd(Enum.take(stream |> to_values, 1))
+  defp stream_headers(stream, schema) do
+    hd(Enum.take(stream |> decode(schema), 1))
+  end
+
+  defp maybe_remove_header(stream, schema) do
+    if EctoCSV.file_has_header?(schema) do
+      stream |> remove_header
+    else
+      stream
+    end
   end
 
   defp remove_header(stream) do
@@ -42,9 +50,8 @@ defmodule EctoCSV.Loader do
     end)
   end
 
-  def to_values(stream) do
-    Nimble
-    .load(stream)
+  def decode(stream, schema) do
+    CSV.decode(stream, schema)
   end
 
   defp to_struct(stream, schema, headers) do

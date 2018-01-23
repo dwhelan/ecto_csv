@@ -1,5 +1,4 @@
 defmodule EctoCSV.Loader.HeaderTest do
-  require Briefly
   use ExUnit.Case
   
   defmodule Example do
