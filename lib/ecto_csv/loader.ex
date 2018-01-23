@@ -1,5 +1,5 @@
 defmodule EctoCSV.Loader do
-  alias NimbleCSV.RFC4180, as: Parser
+  alias EctoCSV.Adapters.Nimble
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -43,7 +43,8 @@ defmodule EctoCSV.Loader do
   end
 
   def to_values(stream) do
-    Parser.parse_stream(stream, headers: false)
+    Nimble
+    .load(stream)
   end
 
   defp to_struct(stream, schema, headers) do

@@ -7,6 +7,7 @@ defmodule EctoCSV.Loader.DelimiterTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
@@ -18,10 +19,11 @@ defmodule EctoCSV.Loader.DelimiterTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
-      # delimiter ","
+      delimiter ","
     end
   end
 
@@ -30,26 +32,26 @@ defmodule EctoCSV.Loader.DelimiterTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
-      # delimiter "|"
+      delimiter "|"
     end
   end
 
   describe "that delimiter" do
     test "will default to 'comma'" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], Example) |> Enum.take(1))
+      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], Example) |> Enum.take(1))
+    end
+
+    test "will allow a comma" do
+      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], ExampleWithComma) |> Enum.take(1))
     end
 
     @tag :wip
-    test "will use specified delimiter" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], ExampleWithComma) |> Enum.take(1))
-    end
-
-    @tag :wip
-    test "in schema will be used when header is 'false'" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["1"], ExampleWithVerticalBar) |> Enum.take(1))
+    test "will allow an arbitrary character" do
+      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a|b", "1|2"], ExampleWithVerticalBar) |> Enum.take(1))
     end
   end
 end
