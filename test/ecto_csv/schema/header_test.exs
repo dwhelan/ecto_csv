@@ -1,4 +1,4 @@
-defmodule EctoCSV.Ideas do
+defmodule EctoCSV.Schema.HeaderTest do
   use ExUnit.Case
 
   defmodule Example do
@@ -23,8 +23,12 @@ defmodule EctoCSV.Ideas do
       assert Example.__csv__(:file_has_header?) == true
     end  
 
-    test "'headers' should be set from fields'" do
+    test "'headers' should be set from fields" do
       assert Example.__csv__(:headers) == [:a, :b, :c]
+    end  
+
+    test "'delimiter' should be a comma'" do
+      assert Example.__csv__(:delimiter) == ","
     end  
   end
 
@@ -37,9 +41,8 @@ defmodule EctoCSV.Ideas do
       field :c
     end
     
-
     csv do
-      header true
+      header    true
     end
   end
 

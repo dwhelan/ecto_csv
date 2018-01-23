@@ -1,5 +1,5 @@
 includes = []
-excludes = [:skip]
+excludes = [:wip, :skip]
 
 # Uncomment the line below to enable focus mode
 # includes = [:focus | includes]; excludes = [:test | excludes]
