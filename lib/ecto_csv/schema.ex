@@ -40,6 +40,14 @@ defmodule EctoCSV.Schema do
   end
 
   defmacro delimiter(delimiter) do
+    unless is_binary(delimiter) do
+      raise ArgumentError, "delimiter '#{delimiter}' is invalid. It must be a string enclosed in double quotes"
+    end
+
+    if String.length(delimiter) > 1 do
+      raise ArgumentError, "delimiter '#{delimiter}' cannot be more than one character"
+    end
+
     quote do
       Module.put_attribute __MODULE__, :csv_delimiter, unquote(delimiter)
     end
