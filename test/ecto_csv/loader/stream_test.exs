@@ -1,4 +1,4 @@
-defmodule EctoCSV.LoaderTest do
+defmodule EctoCSV.Loader.StreamTest do
   require Briefly
 
   use ExUnit.Case
@@ -42,42 +42,6 @@ defmodule EctoCSV.LoaderTest do
 
     test "double quotes are preserved in strings" do
       assert %{a: ~s{ "hi" there}} = load_one ["a,b,c", ~s{" ""hi"" there",2,3.45}]
-    end
-  end
-
-  defmodule ExampleWithHeaders do
-    use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      header true
-    end
-  end
-
-  describe "load with headers set to 'true'" do
-    test "that header is loaded" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], ExampleWithHeaders) |> Enum.take(1))
-    end
-  end
-
-  defmodule ExampleWithoutHeaders do
-    use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      header false
-    end
-  end
-
-  describe "load with headers set to 'false'" do
-    test "that header is not loaded" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["1"], ExampleWithoutHeaders) |> Enum.take(1))
     end
   end
 
