@@ -3,9 +3,39 @@ defmodule EctoCSV.Adapters.CSVTest do
 
   use ExUnit.Case
 
+  defmodule Default do
+    use EctoCSV.Schema
+
+    schema "test" do
+      field :a
+      field :b
+    end
+
+    csv do
+    end
+  end
+
+  defmodule Pipe do
+    use EctoCSV.Schema
+
+    schema "test" do
+      field :a
+      field :b
+    end
+
+    csv do
+      delimiter "|"
+    end
+  end
+
   describe "decode" do
-    test "that it should load a valid stream" do
-      lines = CSV.decode(["a,b", "1,2"], %{}) |> Enum.to_list
+    test "that it should decode with comma as the delimiter" do
+      lines = CSV.decode(["a,b", "1,2"], Default) |> Enum.to_list
+      assert lines == [["a", "b"], ["1", "2"]]
+    end
+
+    test "that it should decode with | as the delimiter" do
+      lines = CSV.decode(["a|b", "1|2"], Pipe) |> Enum.to_list
       assert lines == [["a", "b"], ["1", "2"]]
     end
   end
