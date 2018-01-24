@@ -48,7 +48,6 @@ defmodule EctoCSV.Loader.DelimiterTest do
       assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], ExampleWithComma) |> Enum.take(1))
     end
 
-    @tag :wip
     test "will allow an arbitrary character" do
       assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a|b", "1|2"], ExampleWithVerticalBar) |> Enum.take(1))
     end

@@ -1,24 +1,34 @@
 defmodule EctoCSV.Dumper do
   alias NimbleCSV.RFC4180, as: Formatter
+  alias EctoCSV.Adapters.Nimble
+  alias EctoCSV.Adapters.CSV
 
+  
   def dump(stream, path) do
     dump(stream) |> Enum.into(File.stream!(path))
   end
 
   def dump(stream) do
+    schema = extract_schema(stream)
     stream
     |> to_values
-    |> to_csv
+    |> to_csv(schema)
   end
 
   defp to_values(stream) do
     Stream.transform(stream, 0, fn struct, index -> {row_values(struct, index), index + 1} end )
   end
 
-  defp to_csv(stream) do
+  defp extract_schema(stream) do
+    struct = hd(Enum.take(stream , 1))
+    struct.__struct__
+  end  
+
+  defp to_csv(stream,schema) do
     stream
-    |> Formatter.dump_to_stream
-    |> Stream.map(&IO.iodata_to_binary(&1))
+    |> CSV.encode(schema)
+    # |> Formatter.dump_to_stream
+    # |> Stream.map(&IO.iodata_to_binary(&1))    
   end
 
   defp row_values(struct, index) do
