@@ -15,7 +15,7 @@ defmodule EctoCSV.Adapters.CSV do
 
   defp options(schema) do
     [
-      separator: hd(String.to_charlist(schema.__csv__(:delimiter))),
+      separator: hd(String.to_charlist(schema.__csv__(:separator))),
       delimiter: "\n"
     ]
   end

@@ -1,4 +1,4 @@
-defmodule EctoCSV.Loader.DelimiterTest do
+defmodule EctoCSV.Loader.SeparatorTest do
   use ExUnit.Case
   
   defmodule Example do
@@ -22,7 +22,7 @@ defmodule EctoCSV.Loader.DelimiterTest do
     end
 
     csv do
-      delimiter ","
+      separator ","
     end
   end
 
@@ -35,11 +35,11 @@ defmodule EctoCSV.Loader.DelimiterTest do
     end
 
     csv do
-      delimiter "|"
+      separator "|"
     end
   end
 
-  describe "that delimiter" do
+  describe "that separator" do
     test "will default to 'comma'" do
       assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], Example) |> Enum.take(1))
     end

@@ -1,4 +1,4 @@
-defmodule EctoCSV.Dumper.DelimiterTest do
+defmodule EctoCSV.Dumper.SeparatorTest do
   use ExUnit.Case
 
   defmodule ExamplePipe do
@@ -10,7 +10,7 @@ defmodule EctoCSV.Dumper.DelimiterTest do
     end
 
     csv do
-      delimiter  "|"      
+      separator  "|"      
     end 
   end
   

@@ -1,4 +1,4 @@
-defmodule EctoCSV.Schema.DelimiterTest do
+defmodule EctoCSV.Schema.SeparatorTest do
   use ExUnit.Case
 
   defmodule Example do
@@ -8,51 +8,51 @@ defmodule EctoCSV.Schema.DelimiterTest do
     end
   end
 
-  test "with empty csv block 'delimiter' should be a comma'" do
-    assert Example.__csv__(:delimiter) == ","
+  test "with empty csv block 'separator' should be a comma'" do
+    assert Example.__csv__(:separator) == ","
   end  
 
   defmodule Example2 do
     use EctoCSV.Schema
 
     csv do
-      delimiter "|"
+      separator "|"
     end
   end
 
-  test "'delimiters' should be set from 'delimiter''" do
-    assert Example2.__csv__(:delimiter) == "|"
+  test "'separators' should be set from 'separator''" do
+    assert Example2.__csv__(:separator) == "|"
   end
 
   require CompileTimeAssertions
 
-  describe "delimiter validation" do
-    test "that delimiter cannot be more than one character" do
+  describe "separator validation" do
+    test "that separator cannot be more than one character" do
       code =
       """
         defmodule Example2 do
           use EctoCSV.Schema
       
           csv do
-            delimiter "ab"
+            separator "ab"
           end
         end
       """
-      CompileTimeAssertions.assert_error(ArgumentError, "delimiter 'ab' cannot be more than one character", code)
+      CompileTimeAssertions.assert_error(ArgumentError, "separator 'ab' cannot be more than one character", code)
     end
 
-    test "that delimiter must be a string" do
+    test "that separator must be a string" do
       code =
       """
         defmodule Example2 do
           use EctoCSV.Schema
       
           csv do
-            delimiter 1
+            separator 1
           end
         end
       """
-      CompileTimeAssertions.assert_error(ArgumentError, "delimiter '1' is invalid. It must be a string enclosed in double quotes", code)
+      CompileTimeAssertions.assert_error(ArgumentError, "separator '1' is invalid. It must be a string enclosed in double quotes", code)
     end
   end
 end

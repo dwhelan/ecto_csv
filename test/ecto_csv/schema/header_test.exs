@@ -27,8 +27,8 @@ defmodule EctoCSV.Schema.HeaderTest do
       assert Example.__csv__(:headers) == [:a, :b, :c]
     end  
 
-    test "'delimiter' should be a comma'" do
-      assert Example.__csv__(:delimiter) == ","
+    test "'separator' should be a comma'" do
+      assert Example.__csv__(:separator) == ","
     end  
   end
 
