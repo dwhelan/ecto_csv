@@ -67,9 +67,47 @@ defmodule EctoCSV.Dumper.DumperTest do
     end
   end
 
+  defmodule ExampleWithTwoNewLines do
+    use EctoCSV.Schema
+
+    schema "test" do
+      field :a
+    end
+
+    csv do
+      delimiter "\n\n"
+    end
+  end
+
+  defmodule ExampleWithNewLineReturn do
+    use EctoCSV.Schema
+
+    schema "test" do
+      field :a
+    end
+
+    csv do
+      delimiter "\n\r"
+    end
+  end
+
   describe "dump with headers set to 'false'" do
     test "header is not dumped" do
       assert ["1\n"] = dump(%ExampleWithoutHeaders{a: "1"})
+    end
+  end
+
+  describe "dump with delimiters set" do
+    test "delimiter is new line" do
+      assert ["a\n", "1\n"] = dump(%ExampleWithHeaders{a: "1"})
+    end
+
+    test "delimiter is two new lines" do
+      assert ["a\n\n", "1\n\n"] = dump(%ExampleWithTwoNewLines{a: "1"})
+    end
+
+    test "delimiter is new line and carriage return" do
+      assert ["a\n\r", "1\n\r"] = dump(%ExampleWithNewLineReturn{a: "1"})
     end
   end
 

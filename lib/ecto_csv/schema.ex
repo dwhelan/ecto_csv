@@ -8,6 +8,7 @@ defmodule EctoCSV.Schema do
       # Set up defaults
       header     true
       separator  ","
+      delimiter  "\n"
    end
   end
 
@@ -20,22 +21,33 @@ defmodule EctoCSV.Schema do
 
   defmacro csv do
     quote do
-      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header, @csv_separator)
+      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header, @csv_separator, @csv_delimiter)
     end
   end
 
-  def __csv__(header, separator) do
+  def __csv__(header, separator, delimiter) do
     quote do
       def __csv__(:header),           do: unquote(header)
       def __csv__(:file_has_header?), do: unquote(header != false)
       def __csv__(:headers),          do: __MODULE__.__schema__(:fields) |> Enum.filter(&(&1 != :id))
       def __csv__(:separator),        do: unquote(separator)
+      def __csv__(:delimiter),        do: unquote(delimiter)
     end
   end
 
   defmacro header(header) do
     quote do
       Module.put_attribute __MODULE__, :csv_header, unquote(header)
+    end
+  end
+
+  defmacro delimiter(delimiter) do
+    unless is_binary(delimiter) do
+      raise ArgumentError, "delimiter '#{delimiter}' is invalid. It must be a string enclosed in double quotes"
+    end
+    
+    quote do
+      Module.put_attribute __MODULE__, :csv_delimiter, unquote(delimiter)
     end
   end
 

@@ -10,13 +10,13 @@ defmodule EctoCSV.Adapters.CSV do
   
   def encode(stream,schema) do
     stream
-    |> Elixir.CSV.encode( options(schema) )
+    |> Elixir.CSV.encode(options(schema))
   end
 
   defp options(schema) do
     [
       separator: hd(String.to_charlist(schema.__csv__(:separator))),
-      delimiter: "\n"
+      delimiter: schema.__csv__(:delimiter)
     ]
   end
 end
