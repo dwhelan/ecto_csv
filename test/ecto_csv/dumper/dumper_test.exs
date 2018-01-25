@@ -1,4 +1,4 @@
-defmodule EctoCSV.DumperTest do
+defmodule EctoCSV.Dumper.DumperTest do
   use ExUnit.Case
 
   defmodule Example do
