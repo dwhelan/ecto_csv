@@ -1,7 +1,7 @@
 defmodule EctoCSV.Loader.SeparatorTest do
   use ExUnit.Case
   
-  defmodule Example do
+  defmodule Default do
     use EctoCSV.Schema
 
     schema "test" do
@@ -13,7 +13,11 @@ defmodule EctoCSV.Loader.SeparatorTest do
     end
   end
 
-  defmodule ExampleWithComma do
+  test "separator will default to 'comma'" do
+    assert %{a: "1", b: "2"} = load(["a,b", "1,2"], Default)
+  end
+
+  defmodule Comma do
     use EctoCSV.Schema
 
     schema "test" do
@@ -26,7 +30,11 @@ defmodule EctoCSV.Loader.SeparatorTest do
     end
   end
 
-  defmodule ExampleWithVerticalBar do
+  test "that separator can be a comma" do
+    assert %{a: "1", b: "2"} = load(["a,b", "1,2"], Comma)
+  end
+
+  defmodule Pipe do
     use EctoCSV.Schema
 
     schema "test" do
@@ -39,17 +47,28 @@ defmodule EctoCSV.Loader.SeparatorTest do
     end
   end
 
-  describe "that separator" do
-    test "will default to 'comma'" do
-      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], Example) |> Enum.take(1))
+  test "separator can be a pipe" do
+    assert %{a: "1", b: "2"} = load(["a|b", "1|2"], Pipe)
+  end
+
+  defmodule Tab do
+    use EctoCSV.Schema
+
+    schema "test" do
+      field :a
+      field :b
     end
 
-    test "will allow a comma" do
-      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a,b", "1,2"], ExampleWithComma) |> Enum.take(1))
+    csv do
+      separator "\t"
     end
+  end
 
-    test "will allow an arbitrary character" do
-      assert %{a: "1", b: "2"} = hd(EctoCSV.Loader.load(["a|b", "1|2"], ExampleWithVerticalBar) |> Enum.take(1))
-    end
+  test "separator can be a tab" do
+    assert %{a: "1", b: "2"} = load(["a\tb", "1\t2"], Tab)
+  end
+
+  defp load(stream, schema) do
+    hd(EctoCSV.Loader.load(stream, schema) |> Enum.take(1))
   end
 end

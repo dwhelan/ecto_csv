@@ -2,9 +2,9 @@
 * handle header row with blank cells (allow code to specify name or field number)
 
 * loader
+    * file with headers - validate they match schema? use to map, missing, extra
     * handle an "id" key
     * load!
-    * file with headers - validate they match schema? use to map, missing, extra
     * import with no schema -> create map
     * import with empty schema -> create struct
     * load streams without headers
@@ -19,4 +19,4 @@
     * create lists of fields to export from schema (e.g.  @csv dump: [except: :id])
 
 * mix
-    * `mix csv.create_schema <file>` auto generate schema fields from header in file
+    * `mix csv.create_schema <file> <schema path>` auto generate schema fields from header in file

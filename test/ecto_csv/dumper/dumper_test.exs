@@ -10,104 +10,31 @@ defmodule EctoCSV.Dumper.DumperTest do
       field :c, :float
     end
 
-    csv()
+    csv do
+    end
   end
 
   describe "dump" do
     test "header is created" do
-      assert ["a,b,c\n", _] = dump(%Example{})
+      assert ["a,b,c\r\n", _] = dump(%Example{})
     end
 
     test "fields with no data type should be dumped as empty strings" do
-      assert [_, ",,\n"] = dump(%Example{})
+      assert [_, ",,\r\n"] = dump(%Example{})
     end
 
     test "fields with a data type should be dumped as their type" do
-      assert [_, ",2,3.4\n"] = dump(%Example{b: 2, c: 3.4})
+      assert [_, ",2,3.4\r\n"] = dump(%Example{b: 2, c: 3.4})
     end
 
     test "double quotes are preserved in strings" do
-      assert [_, ~s{" ""hi"" there",,\n}] = dump(%Example{a: ~s{ "hi" there}})
+      assert [_, ~s{" ""hi"" there",,\r\n}] = dump(%Example{a: ~s{ "hi" there}})
     end
 
     test "that records can be dumped to files" do
       path = TestFile.create();
       EctoCSV.Dumper.dump([%Example{a: "hi", b: 2, c: 3.4}, %Example{a: "there", b: 5, c: 6.7}], path)
-      assert {:ok, "a,b,c\nhi,2,3.4\nthere,5,6.7\n"} = File.read(path)
-    end
-  end
-
-  defmodule ExampleWithHeaders do
-    use EctoCSV.Schema
-    
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      header true
-    end
-  end
-
-  describe "dump with headers set to 'true'" do
-    test "header is dumped" do
-      assert ["a\n", "1\n"] = dump(%ExampleWithHeaders{a: "1"})
-    end
-  end
-
-  defmodule ExampleWithoutHeaders do
-    use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      header false
-    end
-  end
-
-  defmodule ExampleWithTwoNewLines do
-    use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      delimiter "\n\n"
-    end
-  end
-
-  defmodule ExampleWithNewLineReturn do
-    use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      delimiter "\n\r"
-    end
-  end
-
-  describe "dump with headers set to 'false'" do
-    test "header is not dumped" do
-      assert ["1\n"] = dump(%ExampleWithoutHeaders{a: "1"})
-    end
-  end
-
-  describe "dump with delimiters set" do
-    test "delimiter is new line" do
-      assert ["a\n", "1\n"] = dump(%ExampleWithHeaders{a: "1"})
-    end
-
-    test "delimiter is two new lines" do
-      assert ["a\n\n", "1\n\n"] = dump(%ExampleWithTwoNewLines{a: "1"})
-    end
-
-    test "delimiter is new line and carriage return" do
-      assert ["a\n\r", "1\n\r"] = dump(%ExampleWithNewLineReturn{a: "1"})
+      assert {:ok, "a,b,c\r\nhi,2,3.4\r\nthere,5,6.7\r\n"} = File.read(path)
     end
   end
 

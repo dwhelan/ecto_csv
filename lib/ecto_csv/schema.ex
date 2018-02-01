@@ -8,7 +8,7 @@ defmodule EctoCSV.Schema do
       # Set up defaults
       header     true
       separator  ","
-      delimiter  "\n"
+      delimiter  "\r\n"
    end
   end
 
@@ -42,8 +42,8 @@ defmodule EctoCSV.Schema do
   end
 
   defmacro delimiter(delimiter) do
-    unless is_binary(delimiter) do
-      raise ArgumentError, "delimiter '#{delimiter}' is invalid. It must be a string enclosed in double quotes"
+    unless delimiter == "\n" or delimiter == "\r\n" do
+      raise ArgumentError, ~s[delimiter is invalid. It must be either "\\n" or "\\r\\n"]
     end
     
     quote do

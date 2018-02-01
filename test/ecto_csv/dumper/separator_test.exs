@@ -6,20 +6,19 @@ defmodule EctoCSV.Dumper.SeparatorTest do
 
     schema "test" do
       field :a
-      field :b, :integer
+      field :b
     end
 
     csv do
-      separator  "|"      
+      separator "|"
     end 
   end
   
-  test "header is created with pipes" do
-    assert ["a|b\n", _] = dump(%ExamplePipe{})
+  test "dumped values are separated by separator" do
+    assert ["a|b\r\n", "1|2\r\n"] = dump(%ExamplePipe{a: "1", b: "2"})
   end
 
   defp dump(lines) do
     EctoCSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
   end
-
 end
