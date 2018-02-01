@@ -1,5 +1,4 @@
 defmodule EctoCSV.Adapters.CSV do
-  
   require CSV
 
   def decode(stream, schema) do

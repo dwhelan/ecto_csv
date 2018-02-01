@@ -1,5 +1,4 @@
 defmodule EctoCSV.Loader do
-  alias EctoCSV.Adapters.Nimble
   alias EctoCSV.Adapters.CSV
 
   @moduledoc """

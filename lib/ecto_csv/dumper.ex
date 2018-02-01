@@ -1,9 +1,6 @@
 defmodule EctoCSV.Dumper do
-  alias NimbleCSV.RFC4180, as: Formatter
-  alias EctoCSV.Adapters.Nimble
   alias EctoCSV.Adapters.CSV
 
-  
   def dump(stream, path) do
     dump(stream) |> Enum.into(File.stream!(path))
   end
