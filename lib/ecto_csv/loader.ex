@@ -19,27 +19,18 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
-    headers = extract_headers(stream, schema)
+    {stream, headers} = extract_headers(stream, schema)
 
     stream
-    |> maybe_remove_header(schema)
     |> decode(schema)
     |> to_struct(schema, headers)
   end
 
   defp extract_headers(stream, schema) do
     if EctoCSV.file_has_header?(schema) do
-      stream_headers(stream, schema)
+      {stream |> remove_header, stream_headers(stream, schema)}
     else
-      EctoCSV.headers(schema)
-    end
-  end
-
-  defp maybe_remove_header(stream, schema) do
-    if EctoCSV.file_has_header?(schema) do
-      stream |> remove_header
-    else
-      stream
+      {stream, EctoCSV.headers(schema)}
     end
   end
 
