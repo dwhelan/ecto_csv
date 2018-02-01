@@ -1,7 +1,7 @@
 defmodule EctoCSV.Loader.HeaderTest do
   use ExUnit.Case
   
-  defmodule Example do
+  defmodule Default do
     use EctoCSV.Schema
 
     schema "test" do
@@ -12,7 +12,7 @@ defmodule EctoCSV.Loader.HeaderTest do
     end
   end
 
-  defmodule ExampleWithHeaders do
+  defmodule HeadersTrue do
     use EctoCSV.Schema
 
     schema "test" do
@@ -24,7 +24,7 @@ defmodule EctoCSV.Loader.HeaderTest do
     end
   end
 
-  defmodule ExampleWithoutHeaders do
+  defmodule HeadersFalse do
     use EctoCSV.Schema
 
     schema "test" do
@@ -38,15 +38,15 @@ defmodule EctoCSV.Loader.HeaderTest do
 
   describe "that header" do
     test "will default to 'true'" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], Example) |> Enum.take(1))
+      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], Default) |> Enum.take(1))
     end
 
     test "in stream will be used when header is 'true'" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], ExampleWithHeaders) |> Enum.take(1))
+      assert %{a: "1"} = hd(EctoCSV.Loader.load(["a", "1"], HeadersTrue) |> Enum.take(1))
     end
 
     test "in schema will be used when header is 'false'" do
-      assert %{a: "1"} = hd(EctoCSV.Loader.load(["1"], ExampleWithoutHeaders) |> Enum.take(1))
+      assert %{a: "1"} = hd(EctoCSV.Loader.load(["1"], HeadersFalse) |> Enum.take(1))
     end
   end
 end

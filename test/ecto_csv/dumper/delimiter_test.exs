@@ -51,7 +51,7 @@ defmodule EctoCSV.Dumper.DelimiterTest do
   end
 
   test "that lines can be written with a delimiter of '\r\n'" do
-    assert ["a,b,c\r\n", "a,1,2.3\r\n"] = dump(%CRzLF{a: "a", b: 1, c: 2.3})
+    assert ["a,b,c\r\n", "a,1,2.3\r\n"] = dump(%CRLF{a: "a", b: 1, c: 2.3})
   end
 
   defp dump(lines) do
