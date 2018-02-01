@@ -19,16 +19,17 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
-    extract_headers(stream, schema)
-    |> decode(schema)
-    |> to_struct(schema)
+    {stream, schema}
+    |> extract_headers
+    |> decode
+    |> to_struct_stream
   end
 
-  defp extract_headers(stream, schema) do
+  defp extract_headers({stream, schema}) do
     if EctoCSV.file_has_header?(schema) do
-      {stream |> remove_header, file_headers(stream, schema)}
+      {stream |> remove_header, schema, file_headers(stream, schema)}
     else
-      {stream, EctoCSV.headers(schema)}
+      {stream, schema, EctoCSV.headers(schema)}
     end
   end
 
@@ -46,11 +47,11 @@ defmodule EctoCSV.Loader do
     end)
   end
 
-  def decode({stream, headers}, schema) do
-    {CSV.decode(stream, schema), headers}
+  def decode({stream, schema, headers}) do
+    {CSV.decode(stream, schema), schema, headers}
   end
 
-  defp to_struct({stream, headers}, schema) do
+  defp to_struct_stream({stream, schema, headers}) do
     Stream.map(stream, &create_struct(&1, schema, headers))
   end
 
