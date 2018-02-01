@@ -19,8 +19,7 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
-    _headers = stream_headers(stream, schema)
-    headers = EctoCSV.headers(schema)
+    headers = extract_headers(stream, schema)
 
     stream
     |> maybe_remove_header(schema)
@@ -28,8 +27,12 @@ defmodule EctoCSV.Loader do
     |> to_struct(schema, headers)
   end
 
-  defp stream_headers(stream, schema) do
-    hd(Enum.take(stream |> decode(schema), 1))
+  defp extract_headers(stream, schema) do
+    if EctoCSV.file_has_header?(schema) do
+      stream_headers(stream, schema)
+    else
+      EctoCSV.headers(schema)
+    end
   end
 
   defp maybe_remove_header(stream, schema) do
@@ -38,6 +41,11 @@ defmodule EctoCSV.Loader do
     else
       stream
     end
+  end
+
+  defp stream_headers(stream, schema) do
+    hd(Enum.take(stream |> decode(schema), 1))
+    |> Enum.map(&to_atom(&1))
   end
 
   defp remove_header(stream) do
@@ -64,5 +72,13 @@ defmodule EctoCSV.Loader do
   defp set_struct_value({field, value}, struct, schema) do
     {:ok, value} = EctoCSV.cast(schema, field, value)
     struct(struct, Keyword.new([{field, value}]))
+  end
+
+  defp to_atom(string) do
+    try do
+      String.to_existing_atom(string)
+    rescue ArgumentError -> 
+      String.to_atom(string)
+    end
   end
 end

@@ -6,6 +6,7 @@ defmodule EctoCSV.Loader.HeaderTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
@@ -13,7 +14,12 @@ defmodule EctoCSV.Loader.HeaderTest do
   end
 
   test "header will default to 'true'" do
-    assert %{a: "1"} = load(["a", "1"], Default)
+    assert %{a: "1", b: "2"} = load(["a,b", "1,2"], Default)
+  end
+
+  @tag :focus
+  test "values will be assigned based on the order in the file header" do
+    assert %{a: "1", b: "2"} = load(["b,a", "2,1"], Default)
   end
 
   defmodule HeadersTrue do
@@ -21,6 +27,7 @@ defmodule EctoCSV.Loader.HeaderTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
@@ -29,7 +36,7 @@ defmodule EctoCSV.Loader.HeaderTest do
   end
 
   test "header will be loaded when header is 'true'" do
-    assert %{a: "1"} = load(["a", "1"], HeadersTrue)
+    assert %{a: "1", b: "2"} = load(["a,b", "1,2"], HeadersTrue)
   end
 
   defmodule HeadersFalse do
@@ -37,6 +44,7 @@ defmodule EctoCSV.Loader.HeaderTest do
 
     schema "test" do
       field :a
+      field :b
     end
 
     csv do
@@ -45,7 +53,7 @@ defmodule EctoCSV.Loader.HeaderTest do
   end
 
   test "header will be from schema when header is 'false'" do
-    assert %{a: "1"} = load(["1"], HeadersFalse)
+    assert %{a: "1", b: "2"} = load(["1,2"], HeadersFalse)
   end
 
   defp load(path, schema) do
