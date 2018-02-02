@@ -1,6 +1,5 @@
 defmodule EctoCSV.Loader.StreamTest do
   require Briefly
-
   use ExUnit.Case
   
   defmodule Example do
@@ -18,53 +17,35 @@ defmodule EctoCSV.Loader.StreamTest do
 
   describe "load from stream" do
     test "fields with no data type gets a type of 'string'" do
-      assert %Example{a: "1"} = load_one(["a", "1"])
+      assert [%Example{a: "1"}] = load(["a", "1"])
     end
 
     test "values are converted to the defined data type" do
-      assert %Example{b: 2} = load_one(["a,b", "1,2"])
-    end
-
-    test "fields not defined in the schema are loaded as strings" do
-      assert %{x: "1"} = load_one(["x", "1"])
+      assert [%Example{b: 2}] = load(["a,b", "1,2"])
     end
 
     test "multiple rows can be loaded" do
-      assert load_all(["a", "1", "2"]) |> length == 2
+      assert [%Example{a: "1"}, %Example{a: "2"}] = load(["a", "1", "2"])
     end
 
     test "multiple fields per row can be loaded" do
-      assert %{a: "1", b: 2, c: 3.45} = load_one ["a,b,c", "1,2,3.45"]
+      assert [%{a: "1", b: 2, c: 3.45}] = load ["a,b,c", "1,2,3.45"]
     end
 
     test "white space is preserved in strings" do
-      assert %{a: " 1 "} = load_one ["a,b,c", " 1 ,2,3.45"]
+      assert [%{a: " 1 "}] = load ["a,b,c", " 1 ,2,3.45"]
     end
 
     test "double quotes are preserved in strings" do
-      assert %{a: ~s{ "hi" there}} = load_one ["a,b,c", ~s{" ""hi"" there",2,3.45}]
+      assert [%{a: ~s{ "hi" there}}] = load ["a,b,c", ~s{" ""hi"" there",2,3.45}]
     end
   end
 
-  describe "load from file" do
-    test "structs from csv" do
-      assert %{a: "1", b: 2, c: 3.45} = load_one(TestFile.create("a,b,c\n1,2,3.45"))
-    end
+  test "should stream from a file" do
+    assert [%{a: "1", b: 2, c: 3.45}] = load(TestFile.create("a,b,c\n1,2,3.45"))
   end
 
-  defp load_one(lines) do
-    hd(load(lines, 1))
-  end
-  
-  defp load_all(lines) do
-    load(lines) |> Enum.to_list
-  end
-  
-  defp load(lines, count) do
-    load(lines) |> Enum.take(count)
-  end
-  
   defp load(lines) do
-    EctoCSV.Loader.load(lines, Example)
+    EctoCSV.Loader.load(lines, Example) |> Enum.to_list
   end
 end
