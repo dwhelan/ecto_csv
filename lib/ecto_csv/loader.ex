@@ -60,7 +60,8 @@ defmodule EctoCSV.Loader do
   end
 
   defp set_struct_value({field, value}, struct, schema) do
-    {:ok, value} = EctoCSV.cast(schema, field, value)
+    type = schema.__schema__(:type, field) || :string
+    {:ok, value} = Ecto.Type.cast(type, value)
     Map.put(struct, field, value)
   end
 

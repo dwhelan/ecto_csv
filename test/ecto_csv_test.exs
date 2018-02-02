@@ -12,16 +12,6 @@ defmodule EctoCSVTest do
     end
   end
 
-  describe "cast" do
-    test "should cast a string when type is not defined" do
-      assert cast(:"A1", "foo") == {:ok, "foo"}
-    end
-
-    test "should cast to built-in data types" do
-      assert cast(:a2, "1") == {:ok, 1}
-    end
-  end
-
   describe "dump" do
     test "should dump a string when type is not defined" do
       assert dump(:"A1", "foo") == {:ok, "foo"}
@@ -30,10 +20,6 @@ defmodule EctoCSVTest do
     test "should dump from built-in data types" do
       assert dump(:a2, 1) == {:ok, 1}
     end
-  end
-
-  defp cast(field, value) do
-    EctoCSV.cast(EctoCSVTest.File, field, value)
   end
 
   defp dump(field, value) do
