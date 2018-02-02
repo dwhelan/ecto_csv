@@ -1,18 +1,6 @@
 defmodule EctoCSV do
   alias Ecto.Type
 
-  def file_has_header?(schema) when is_atom(schema) do
-    if Keyword.has_key?(schema.__info__(:functions), :__csv__) do
-      schema.__csv__(:file_has_header?)
-    else
-      true
-    end
-  end
-
-  def file_has_header?(struct) do
-    file_has_header?(struct.__struct__)
-  end
-
   def headers(schema) when is_atom(schema) do
     schema.__csv__(:headers)
   end

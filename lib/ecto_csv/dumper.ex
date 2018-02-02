@@ -22,14 +22,13 @@ defmodule EctoCSV.Dumper do
   end  
 
   defp to_csv(stream,schema) do
-    stream
-    |> CSV.encode(schema)
-    # |> Formatter.dump_to_stream
-    # |> Stream.map(&IO.iodata_to_binary(&1))    
+    stream |> CSV.encode(schema)
   end
 
   defp row_values(struct, index) do
-    if index == 0 && EctoCSV.file_has_header?(struct) do
+    schema = struct.__struct__
+
+    if index == 0 && schema.__csv__(:file_has_header?) do
       [EctoCSV.headers(struct), row_values(struct)]
     else
       [row_values(struct)]

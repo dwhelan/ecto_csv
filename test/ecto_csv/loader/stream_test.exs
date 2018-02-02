@@ -12,7 +12,8 @@ defmodule EctoCSV.Loader.StreamTest do
       field :c, :float
     end
 
-    csv()
+    csv do
+    end
   end
 
   describe "load from stream" do

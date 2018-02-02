@@ -26,7 +26,7 @@ defmodule EctoCSV.Loader do
   end
 
   defp extract_headers({stream, schema}) do
-    if EctoCSV.file_has_header?(schema) do
+    if schema.__csv__(:file_has_header?) do
       {stream |> remove_header, schema, file_headers(stream, schema)}
     else
       {stream, schema, EctoCSV.headers(schema)}
