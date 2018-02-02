@@ -52,20 +52,20 @@ defmodule EctoCSV.Loader do
   end
 
   defp to_struct_stream({stream, schema, headers}) do
-    Stream.map(stream, &create_struct(&1, schema, headers))
+    Stream.map(stream, &load_row(&1, schema, headers))
   end
 
-  defp create_struct(values, schema, headers) do
-    Enum.zip(headers, values) |> Enum.reduce(struct(schema), &set_struct_value(&1, &2, schema))
+  defp load_row(values, schema, headers) do
+    Enum.zip(headers, values) |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
   end
 
-  defp set_struct_value({field, value}, struct, schema) do
-    if schema.__csv__(:extra_columns) == :ignore do
-      struct
-    else
-      type = schema.__schema__(:type, field) || :string
-      {:ok, value} = Ecto.Type.cast(type, value)
-      Map.put(struct, field, value)
+  defp load_value({field, value}, struct, schema) do
+    case schema.__csv__(:extra_columns) do 
+      :ignore -> struct
+      :error  -> raise ArgumentError, message: "extra column '#{field}' found"
+      _       -> type = schema.__schema__(:type, field) || :string
+                 {:ok, value} = Ecto.Type.cast(type, value)
+                 Map.put(struct, field, value)
     end
   end
 
