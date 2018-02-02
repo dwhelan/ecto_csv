@@ -61,7 +61,7 @@ defmodule EctoCSV.Loader do
 
   defp set_struct_value({field, value}, struct, schema) do
     {:ok, value} = EctoCSV.cast(schema, field, value)
-    struct(struct, Keyword.new([{field, value}]))
+    Map.put(struct, field, value)
   end
 
   defp to_atom(string) do

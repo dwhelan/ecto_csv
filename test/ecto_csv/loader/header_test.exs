@@ -17,8 +17,7 @@ defmodule EctoCSV.Loader.HeaderTest do
     assert %{a: "1", b: "2"} = load(["a,b", "1,2"], Default)
   end
 
-  @tag :focus
-  test "values will be assigned based on the order in the file header" do
+  test "values will be assigned based on the header order in the loaded file" do
     assert %{a: "1", b: "2"} = load(["b,a", "2,1"], Default)
   end
 

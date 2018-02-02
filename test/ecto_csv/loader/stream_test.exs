@@ -24,8 +24,8 @@ defmodule EctoCSV.Loader.StreamTest do
       assert %Example{b: 2} = load_one(["a,b", "1,2"])
     end
 
-    test "fields not defined in the schema are ignored" do
-      refute load_one(["x", "1"]) |> Map.has_key?(:x)
+    test "fields not defined in the schema are loaded as strings" do
+      assert %{x: "1"} = load_one(["x", "1"])
     end
 
     test "multiple rows can be loaded" do
