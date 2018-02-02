@@ -1,10 +1,6 @@
 defmodule EctoCSV do
   alias Ecto.Type
 
-  def load(schema, field, value) do
-    type(schema, field) |> Type.load(value)
-  end
-
   def cast(schema, field, value) do
     type(schema, field) |> Type.cast(value)
   end

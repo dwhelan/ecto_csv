@@ -22,16 +22,6 @@ defmodule EctoCSVTest do
     end
   end
 
-  describe "load" do
-    test "should load a string when type is not defined" do
-      assert load(:"A1", "123") == {:ok, "123"}
-    end
-
-    test "should cast to built-in data types" do
-      assert load(:a2, 1) == {:ok, 1}
-    end
-  end
-
   describe "dump" do
     test "should dump a string when type is not defined" do
       assert dump(:"A1", "foo") == {:ok, "foo"}
@@ -40,10 +30,6 @@ defmodule EctoCSVTest do
     test "should dump from built-in data types" do
       assert dump(:a2, 1) == {:ok, 1}
     end
-  end
-
-  defp load(field, value) do
-    EctoCSV.load(EctoCSVTest.File, field, value)
   end
 
   defp cast(field, value) do
