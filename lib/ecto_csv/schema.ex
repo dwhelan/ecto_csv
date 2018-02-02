@@ -6,9 +6,10 @@ defmodule EctoCSV.Schema do
       use Ecto.Schema
 
       # Set up defaults
-      header     true
-      separator  ","
-      delimiter  "\r\n"
+      header        true
+      separator     ","
+      delimiter     "\r\n"
+      extra_columns :retain
    end
   end
 
@@ -21,17 +22,18 @@ defmodule EctoCSV.Schema do
 
   defmacro csv do
     quote do
-      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header, @csv_separator, @csv_delimiter)
+      Module.eval_quoted __ENV__, EctoCSV.Schema.__csv__(@csv_header, @csv_separator, @csv_delimiter, @csv_extra_columns)
     end
   end
 
-  def __csv__(header, separator, delimiter) do
+  def __csv__(header, separator, delimiter, extra_columns) do
     quote do
       def __csv__(:header),           do: unquote(header)
       def __csv__(:file_has_header?), do: unquote(header != false)
       def __csv__(:headers),          do: __MODULE__.__schema__(:fields) |> Enum.filter(&(&1 != :id))
       def __csv__(:separator),        do: unquote(separator)
       def __csv__(:delimiter),        do: unquote(delimiter)
+      def __csv__(:extra_columns),    do: unquote(extra_columns)
     end
   end
 
@@ -62,6 +64,12 @@ defmodule EctoCSV.Schema do
 
     quote do
       Module.put_attribute __MODULE__, :csv_separator, unquote(separator)
+    end
+  end
+
+  defmacro extra_columns(extra_columns) do
+    quote do
+      Module.put_attribute __MODULE__, :csv_extra_columns, unquote(extra_columns)
     end
   end
 end
