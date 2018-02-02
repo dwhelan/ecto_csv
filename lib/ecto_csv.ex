@@ -1,14 +1,6 @@
 defmodule EctoCSV do
   alias Ecto.Type
 
-  def headers(schema) when is_atom(schema) do
-    schema.__csv__(:headers)
-  end
-
-  def headers(struct) do
-    headers(struct.__struct__)
-  end
-
   def load(schema, field, value) do
     type(schema, field) |> Type.load(value)
   end

@@ -29,14 +29,15 @@ defmodule EctoCSV.Dumper do
     schema = struct.__struct__
 
     if index == 0 && schema.__csv__(:file_has_header?) do
-      [EctoCSV.headers(struct), row_values(struct)]
+      [schema.__csv__(:headers), row_values(struct)]
     else
       [row_values(struct)]
     end
   end
 
   defp row_values(struct) do
-    Enum.map(EctoCSV.headers(struct), &struct_value(struct, &1))
+    schema = struct.__struct__
+    Enum.map(schema.__csv__(:headers), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do

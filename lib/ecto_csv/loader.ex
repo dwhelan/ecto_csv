@@ -29,7 +29,7 @@ defmodule EctoCSV.Loader do
     if schema.__csv__(:file_has_header?) do
       {stream |> remove_header, schema, file_headers(stream, schema)}
     else
-      {stream, schema, EctoCSV.headers(schema)}
+      {stream, schema, schema.__csv__(:headers)}
     end
   end
 
