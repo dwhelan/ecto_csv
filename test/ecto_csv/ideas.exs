@@ -44,10 +44,11 @@ defmodule EctoCSV.Ideas do
       header optional: :ignore                  # ignore if present & apply all rules when checking header existence
       header optional: allow: [:extra_columns]  # treat as a header even with extra columns
 
-      # Extra headers are headers that exist in files and not in the schema
-      extra_headers :retain # all data in extra columns will be retained with field name from file header (default)
-      extra_headers :ignore # all data in extra columns will be discarded on load
-      extra_headers rename: ""  # extra headers will be loaded & set to "" on dump - all row data will be preserved
+      # Extra columns have headers that exist in a file but not in the schema
+      extra_columns :retain     # data in extra columns will be retained with field name from file header (default)
+      extra_columns :ignore     # data in extra columns will be discarded on load
+      extra_columns :error      # file will generate an error when loaded if it has extra headers
+      extra_columns rename: ""  # extra headers will be loaded & set to "" on dump - all row data will be preserved
     end
   end
 end

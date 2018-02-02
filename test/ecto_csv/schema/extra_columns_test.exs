@@ -3,13 +3,8 @@ defmodule EctoCSV.Schema.ExtraHeadersTest do
 
   defmodule Default do
     use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-    end
+    schema "test" do end
+    csv do end
   end
 
   test "should default extra columns to :retain" do
@@ -18,17 +13,21 @@ defmodule EctoCSV.Schema.ExtraHeadersTest do
 
   defmodule Retain do
     use EctoCSV.Schema
-
-    schema "test" do
-      field :a
-    end
-
-    csv do
-      extra_columns :retain
-    end
+    schema "test" do end
+    csv do extra_columns :retain end
   end
 
   test "should be able to set extra_columns to :retain" do
     assert Retain.__csv__(:extra_columns) == :retain
+  end
+
+  defmodule Ignore do
+    use EctoCSV.Schema
+    schema "test" do end
+    csv do extra_columns :ignore end
+  end
+
+  test "should be able to set extra_columns to :ignore" do
+    assert Ignore.__csv__(:extra_columns) == :ignore
   end
 end
