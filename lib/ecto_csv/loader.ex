@@ -75,6 +75,10 @@ defmodule EctoCSV.Loader do
   end
 
   defp load_row(values, schema, headers) do
+    if length(values) != length(headers) do
+      raise LoadError.exception(line: 2, message: "extra fields found")
+    end
+
     Enum.zip(headers, values) |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
   end
 

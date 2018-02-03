@@ -8,9 +8,15 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
     csv do end
   end
 
-  test "by default fields not defined in the schema are retained as strings" do
-    assert %{x: "1"} = load(["x", "1"], Default)
+  test "by default headers not defined in the schema have values loaded as strings" do
+    assert %{x: "1"} = load ["x", "1"], Default
   end
+
+  test "more fields than column headers should raise an error" do
+    assert_raise LoadError, "extra fields found on line 2", fn ->
+      load ["x", "1,2"], Default
+   end 
+ end
 
   defmodule Ignore do
     use EctoCSV.Schema
@@ -18,7 +24,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
     csv do extra_columns :ignore end
   end
 
-  test "fields not defined in the schema should be ignored if extra_columns set to :ignore" do
+  test "headers not defined in the schema should be ignored if extra_columns set to :ignore" do
     struct = load ["x", "1"], Ignore
     refute Map.has_key? struct, :x
   end
@@ -29,7 +35,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
     csv do extra_columns :error end
   end
 
-  test "fields not defined in the schema should raise an error if extra_columns set to :error" do
+  test "headers not defined in the schema should raise an error if extra_columns set to :error" do
     assert_raise LoadError, "extra column 'x' found on line 1", fn ->
        load ["x", "1"], Error
     end 
