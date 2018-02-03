@@ -1,15 +1,15 @@
 defmodule EctoCSV.Loader.ExtraColumnsTest do
-  require Briefly
+  alias EctoCSV.LoadError
   use ExUnit.Case
   
-  defmodule Example do
+  defmodule Default do
     use EctoCSV.Schema
     schema "test" do end
     csv do end
   end
 
   test "by default fields not defined in the schema are retained as strings" do
-    assert %{x: "1"} = load(["x", "1"], Example)
+    assert %{x: "1"} = load(["x", "1"], Default)
   end
 
   defmodule Ignore do
@@ -30,7 +30,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
   end
 
   test "fields not defined in the schema should raise an error if extra_columns set to :error" do
-    assert_raise ArgumentError, "extra column 'x' found", fn ->
+    assert_raise LoadError, "extra column 'x' found on line 1", fn ->
        load ["x", "1"], Error
     end 
   end

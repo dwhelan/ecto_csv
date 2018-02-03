@@ -1,5 +1,6 @@
 defmodule EctoCSV.Loader do
   alias EctoCSV.Adapters.CSV
+  alias EctoCSV.LoadError
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -62,7 +63,7 @@ defmodule EctoCSV.Loader do
   defp load_value({field, value}, struct, schema) do
     case schema.__csv__(:extra_columns) do 
       :ignore -> struct
-      :error  -> raise ArgumentError, message: "extra column '#{field}' found"
+      :error  -> raise LoadError.exception(line: 1, message: "extra column '#{field}' found")
       _       -> type = schema.__schema__(:type, field) || :string
                  {:ok, value} = Ecto.Type.cast(type, value)
                  Map.put(struct, field, value)
