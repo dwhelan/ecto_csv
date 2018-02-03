@@ -2,8 +2,8 @@ defmodule EctoCSV.Schema do
 
   defmacro __using__(_opts) do
     quote do
-      import unquote __MODULE__
       use Ecto.Schema
+      import unquote __MODULE__
 
       # Set up defaults
       header        true
