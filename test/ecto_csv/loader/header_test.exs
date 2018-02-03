@@ -1,4 +1,5 @@
 defmodule EctoCSV.Loader.HeaderTest do
+  alias EctoCSV.LoadError
   use ExUnit.Case
   
   defmodule Default do
@@ -20,6 +21,12 @@ defmodule EctoCSV.Loader.HeaderTest do
   test "values will be assigned based on the header order in the loaded file" do
     assert %{a: "1", b: "2"} = load(["b,a", "2,1"], Default)
   end
+
+  test "that an error will be raised if a blank header is found" do
+    assert_raise LoadError, "blank header found on line 1", fn ->
+      load(["b,", "2,1"], Default)
+   end 
+ end
 
   defmodule HeadersTrue do
     use EctoCSV.Schema
