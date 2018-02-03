@@ -3,13 +3,13 @@
 
 * loader
     * file with headers - validate they match schema? use to map, missing, extra
+    * get line numbers for error messages
     * handle an "id" key
     * load!
     * import with no schema -> create map
     * import with empty schema -> create struct
     * load streams without headers
     * load from string with \n's and split (could be tricky to handle \n within strings)
-    * auto create struct on import (all values are strings)
 
 * dumper
     * handle an "id" key

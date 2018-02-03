@@ -20,13 +20,13 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
-    {stream, schema}
-    |> extract_headers
+    stream
+    |> extract_headers(schema)
     |> decode
     |> to_struct_stream
   end
 
-  defp extract_headers({stream, schema}) do
+  defp extract_headers(stream, schema) do
     if schema.__csv__(:file_has_header?) do
       {stream |> remove_header, schema, file_headers(stream, schema)}
     else
@@ -36,11 +36,14 @@ defmodule EctoCSV.Loader do
 
   defp file_headers(stream, schema) do
     stream
-    |> CSV.decode(schema)
-    |> Enum.take(1)
-    |> List.first
+    |> decode(schema)
+    |> take_header
     |> ensure_valid_header
-    |> Enum.map(&to_atom(&1))
+    |> to_atom
+  end
+
+  defp take_header(stream) do
+    stream |> Enum.take(1) |> List.first
   end
 
   defp ensure_valid_header(header) do
@@ -66,20 +69,47 @@ defmodule EctoCSV.Loader do
     end)
   end
 
-  def decode({stream, schema, headers}) do
+  defp decode(stream, schema) do
+    CSV.decode(stream, schema)
+  end
+
+  defp decode({stream, schema, headers}) do
     {CSV.decode(stream, schema), schema, headers}
   end
 
   defp to_struct_stream({stream, schema, headers}) do
-    Stream.map(stream, &load_row(&1, schema, headers))
+    stream
+    |> Stream.map(&validate_row({&1, schema, headers}))
+    |> Stream.map(&convert_to_tuples(&1))
+    |> Stream.map(&load_row(&1, schema, headers))
   end
 
-  defp load_row(values, schema, headers) do
-    if length(values) != length(headers) do
-      raise LoadError.exception(line: 2, message: "extra fields found")
+  defp validate_row({values, schema, headers}) do
+    if schema.__csv__(:file_has_header?) do
+      if length(values) != length(headers) do
+        raise LoadError.exception(line: 2, message: "extra fields found")
+      end
+      {values, schema, headers}
+    else
+      if schema.__csv__(:extra_columns) == :retain do
+        {values, schema, create_headers_with_extras(headers, values)}
+      else
+        {values, schema, headers}
+      end
     end
+  end
 
-    Enum.zip(headers, values) |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
+  defp create_headers_with_extras(headers, values) do
+    extra_headers = for x <- length(headers)..length(values), do: Enum.join(["Field", to_string(x+1)])
+    headers ++ to_atom(extra_headers)
+end
+
+  defp convert_to_tuples({values, schema, headers}) do
+    Enum.zip(headers, values)
+  end
+
+  defp load_row(tuples, schema, headers) do
+    tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
   end
 
   defp load_value({field, value}, struct, schema) do
@@ -90,6 +120,10 @@ defmodule EctoCSV.Loader do
                  {:ok, value} = Ecto.Type.cast(type, value)
                  Map.put(struct, field, value)
     end
+  end
+
+  defp to_atom(list) when is_list(list) do
+    list |> Enum.map(&to_atom(&1))
   end
 
   defp to_atom(string) do
