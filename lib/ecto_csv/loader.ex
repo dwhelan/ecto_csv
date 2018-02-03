@@ -35,16 +35,25 @@ defmodule EctoCSV.Loader do
   end
 
   defp file_headers(stream, schema) do
-    hd(Enum.take(stream |> CSV.decode(schema), 1))
+    stream
+    |> CSV.decode(schema)
+    |> Enum.take(1)
+    |> List.first
     |> ensure_valid_header
     |> Enum.map(&to_atom(&1))
   end
 
   defp ensure_valid_header(header) do
-    blank_headers = Enum.filter(header, &(String.length(&1) == 0))
-    if Kernel.length(blank_headers) > 0 do
+    if Enum.filter(header, &(String.length(&1) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
     end
+    
+    duplicates = header -- Enum.uniq(header)
+    if length(duplicates) > 0 do
+      duplicate_string = duplicates |> Enum.uniq |> Enum.join(",")
+      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicate_string}' found")
+    end
+
     header
   end
 

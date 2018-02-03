@@ -24,9 +24,27 @@ defmodule EctoCSV.Loader.HeaderTest do
 
   test "that an error will be raised if a blank header is found" do
     assert_raise LoadError, "blank header found on line 1", fn ->
-      load(["b,", "2,1"], Default)
-   end 
- end
+      load(["a,", "2,1"], Default)
+   end
+  end
+
+  test "that an error will be raised if a duplicate header is found" do
+    assert_raise LoadError, "duplicate headers 'a' found on line 1", fn ->
+      load(["a,a", "2,1"], Default)
+   end
+  end
+
+  test "that an error will be raised if multiple duplicates headers are found" do
+    assert_raise LoadError, "duplicate headers 'a' found on line 1", fn ->
+      load(["a,a,a", "2,2,2"], Default)
+   end
+  end
+
+  test "that an error will be raised if different duplicates headers are found" do
+    assert_raise LoadError, "duplicate headers 'a,b' found on line 1", fn ->
+      load(["a,a,b,b", "2,1,2,1"], Default)
+   end
+  end
 
   defmodule HeadersTrue do
     use EctoCSV.Schema
