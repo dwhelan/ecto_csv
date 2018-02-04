@@ -69,13 +69,13 @@ defmodule EctoCSV.Loader do
     end
 
     if length(duplicates = headers -- Enum.uniq(headers)) > 0 do
-      duplicate_headers = Enum.uniq(duplicates) |> Enum.join(",")
-      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicate_headers}' found")
+      duplicates = Enum.uniq(duplicates) |> Enum.join(",")
+      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicates}' found")
     end
 
     if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
-      extra_headers = Enum.join(remove_extra_values(headers(schema), headers), ",")
-      raise LoadError.exception(line: 1, message: "extra headers '#{extra_headers}' found")
+      extras = Enum.join(to_atom(headers) -- headers(schema), ",")
+      raise LoadError.exception(line: 1, message: "extra headers '#{extras}' found")
     end
 
     headers
