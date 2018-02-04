@@ -25,28 +25,25 @@ defmodule EctoCSV.Loader do
     stream
     |> Header.extract_headers(schema)
     |> decode(schema)
-    |> to_struct_stream(schema)
+    |> validate_row(schema)
+    |> convert_to_tuples()
+    |> load_row(schema)
   end
 
   defp decode({stream, headers}, schema) do
     {CSV.decode(stream, schema), headers}
   end
 
-  defp to_struct_stream({stream, headers}, schema) do
-    stream
-    |> Stream.map(&validate_row({&1, headers}, schema))
-    |> Stream.map(&convert_to_tuples(&1))
-    |> Stream.map(&load_row(&1, schema))
-  end
-
-  defp validate_row({values, headers}, schema) do
-    case extra_columns(schema) do
-      :retain -> {values, create_headers_with_extras(headers, values)}
-      :ignore -> {remove_extra_values(headers, values), headers}
-      :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
-                 raise LoadError.exception(line: 1, message: "extra fields '#{extra_values}' found")
-      _       -> {values, headers}
-    end
+  defp validate_row({stream, headers}, schema) do
+    Stream.map(stream, fn values -> 
+      case extra_columns(schema) do
+        :retain -> {values, create_headers_with_extras(headers, values)}
+        :ignore -> {remove_extra_values(headers, values), headers}
+        :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
+                   raise LoadError.exception(line: 1, message: "extra fields '#{extra_values}' found")
+        _       -> {values, headers}
+      end
+    end)
   end
 
   defp remove_extra_values([], values) do
@@ -62,12 +59,16 @@ defmodule EctoCSV.Loader do
     headers ++ to_atom(extra_headers)
   end
 
-  defp convert_to_tuples({values, headers}) do
-    Enum.zip(headers, values)
+  defp convert_to_tuples(stream) do
+    Stream.map(stream, fn {values, headers} -> 
+      Enum.zip(headers, values)
+    end)
   end
 
-  defp load_row(tuples, schema) do
-    tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
+  defp load_row(stream, schema) do
+    Stream.map(stream, fn tuples -> 
+      tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
+    end)
   end
 
   defp load_value({field, value}, struct, schema) do
