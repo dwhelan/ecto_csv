@@ -34,18 +34,18 @@ defmodule EctoCSV.Loader do
 
   defp to_struct_stream({stream, headers}, schema) do
     stream
-    |> Stream.map(&validate_row({&1, schema, headers}))
+    |> Stream.map(&validate_row({&1, headers}, schema))
     |> Stream.map(&convert_to_tuples(&1))
-    |> Stream.map(&load_row(&1, schema, headers))
+    |> Stream.map(&load_row(&1, schema))
   end
 
-  defp validate_row({values, schema, headers}) do
+  defp validate_row({values, headers}, schema) do
     case extra_columns(schema) do
-      :retain -> {values, schema, create_headers_with_extras(headers, values)}
-      :ignore -> {remove_extra_values(headers, values), schema, headers}
+      :retain -> {values, create_headers_with_extras(headers, values)}
+      :ignore -> {remove_extra_values(headers, values), headers}
       :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
                  raise LoadError.exception(line: 1, message: "extra fields '#{extra_values}' found")
-      _       -> {values, schema, headers}
+      _       -> {values, headers}
     end
   end
 
@@ -62,11 +62,11 @@ defmodule EctoCSV.Loader do
     headers ++ to_atom(extra_headers)
   end
 
-  defp convert_to_tuples({values, _schema, headers}) do
+  defp convert_to_tuples({values, headers}) do
     Enum.zip(headers, values)
   end
 
-  defp load_row(tuples, schema, _headers) do
+  defp load_row(tuples, schema) do
     tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
   end
 
