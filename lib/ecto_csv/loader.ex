@@ -26,19 +26,36 @@ defmodule EctoCSV.Loader do
     |> to_struct_stream
   end
 
+  defp file_has_header?(schema) do
+    schema.__csv__ :file_has_header?
+  end
+
+  defp headers(schema) do
+    schema.__csv__ :headers
+  end
+
+  defp extra_columns(schema) do
+    schema.__csv__ :extra_columns
+  end
+
   defp extract_headers(stream, schema) do
-    if schema.__csv__(:file_has_header?) do
-      {stream |> remove_header, schema, file_headers(stream, schema)}
-    else
-      {stream, schema, schema.__csv__(:headers)}
-    end
+    extract_headers stream, schema, file_has_header?(schema)
+  end
+
+  defp extract_headers(stream, schema, true) do
+    {stream |> remove_header, schema, file_headers(stream, schema)}
+  end
+
+  defp extract_headers(stream, schema, false) do
+    {stream, schema, headers(schema)}
   end
 
   defp file_headers(stream, schema) do
     stream
     |> decode(schema)
     |> take_header
-    |> ensure_valid_header(schema)
+    |> ensure_valid_headers(schema)
+    |> maybe_add_extra_headers(schema)
     |> to_atom
   end
 
@@ -46,27 +63,29 @@ defmodule EctoCSV.Loader do
     stream |> Enum.take(1) |> List.first
   end
 
-  defp ensure_valid_header(header, schema) do
-    if Enum.filter(header, &(String.length(&1) == 0)) |> length > 0 do
+  defp ensure_valid_headers(headers, schema) do
+    if Enum.filter(headers, &(String.length(&1) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
     end
-    
-    duplicates = header -- Enum.uniq(header)
-    if length(duplicates) > 0 do
-      duplicate_string = duplicates |> Enum.uniq |> Enum.join(",")
-      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicate_string}' found")
+
+    if length(duplicates = headers -- Enum.uniq(headers)) > 0 do
+      duplicate_headers = Enum.uniq(duplicates) |> Enum.join(",")
+      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicate_headers}' found")
     end
 
-    schema_headers = schema.__csv__(:headers)
-    if length(header) > length(schema_headers) do
-      case schema.__csv__(:extra_columns) do
-        :retain -> header
-        :ignore -> schema_headers
-        :error  -> extra_values = Enum.join(remove_extra_values(schema_headers, header), ",")
-                   raise LoadError.exception(line: 1, message: "extra columns '#{extra_values}' found")
-      end
+    if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
+      extra_headers = Enum.join(remove_extra_values(headers(schema), headers), ",")
+      raise LoadError.exception(line: 1, message: "extra headers '#{extra_headers}' found")
+    end
+
+    headers
+  end
+
+  defp maybe_add_extra_headers(headers, schema) do
+    if length(headers) > length(headers(schema)) and extra_columns(schema) == :ignore do
+      headers(schema)
     else 
-      header
+      headers
     end
   end
 
