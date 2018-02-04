@@ -38,7 +38,7 @@ defmodule EctoCSV.Loader do
     stream
     |> decode(schema)
     |> take_header
-    |> ensure_valid_header
+    |> ensure_valid_header(schema)
     |> to_atom
   end
 
@@ -46,7 +46,7 @@ defmodule EctoCSV.Loader do
     stream |> Enum.take(1) |> List.first
   end
 
-  defp ensure_valid_header(header) do
+  defp ensure_valid_header(header, schema) do
     if Enum.filter(header, &(String.length(&1) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
     end
@@ -57,7 +57,17 @@ defmodule EctoCSV.Loader do
       raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicate_string}' found")
     end
 
-    header
+    schema_headers = schema.__csv__(:headers)
+    if length(header) > length(schema_headers) do
+      case schema.__csv__(:extra_columns) do
+        :retain -> header
+        :ignore -> schema_headers
+        :error  -> extra_values = Enum.join(remove_extra_values(schema_headers, header), ",")
+                   raise LoadError.exception(line: 1, message: "extra columns '#{extra_values}' found")
+      end
+    else 
+      header
+    end
   end
 
   defp remove_header(stream) do
@@ -85,24 +95,27 @@ defmodule EctoCSV.Loader do
   end
 
   defp validate_row({values, schema, headers}) do
-    if schema.__csv__(:file_has_header?) do
-      if length(values) != length(headers) do
-        raise LoadError.exception(line: 2, message: "extra fields found")
-      end
-      {values, schema, headers}
-    else
-      if schema.__csv__(:extra_columns) == :retain do
-        {values, schema, create_headers_with_extras(headers, values)}
-      else
-        {values, schema, headers}
-      end
+    case schema.__csv__(:extra_columns) do
+      :retain -> {values, schema, create_headers_with_extras(headers, values)}
+      :ignore -> {remove_extra_values(headers, values), schema, headers}
+      :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
+                 raise LoadError.exception(line: 1, message: "extra fields '#{extra_values}' found")
+      _       -> {values, schema, headers}
     end
+  end
+
+  defp remove_extra_values([], values) do
+    values
+  end
+
+  defp remove_extra_values(headers, values) do
+    Enum.take values, length(headers)
   end
 
   defp create_headers_with_extras(headers, values) do
     extra_headers = for x <- length(headers)..length(values), do: Enum.join(["Field", to_string(x+1)])
     headers ++ to_atom(extra_headers)
-end
+  end
 
   defp convert_to_tuples({values, schema, headers}) do
     Enum.zip(headers, values)
@@ -113,24 +126,24 @@ end
   end
 
   defp load_value({field, value}, struct, schema) do
-    case schema.__csv__(:extra_columns) do 
-      :ignore -> struct
-      :error  -> raise LoadError.exception(line: 1, message: "extra column '#{field}' found")
-      _       -> type = schema.__schema__(:type, field) || :string
-                 {:ok, value} = Ecto.Type.cast(type, value)
-                 Map.put(struct, field, value)
-    end
-  end
+    type = schema.__schema__(:type, field) || :string
+    {:ok, value} = Ecto.Type.cast(type, value)
+    Map.put(struct, field, value)
+end
 
   defp to_atom(list) when is_list(list) do
     list |> Enum.map(&to_atom(&1))
   end
 
-  defp to_atom(string) do
+  defp to_atom(string) when is_binary(string) do
     try do
       String.to_existing_atom(string)
     rescue ArgumentError -> 
       String.to_atom(string)
     end
+  end
+
+  defp to_atom(atom) when is_atom(atom) do
+    atom
   end
 end
