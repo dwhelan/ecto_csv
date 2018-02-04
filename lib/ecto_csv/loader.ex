@@ -2,6 +2,7 @@ defmodule EctoCSV.Loader do
   alias Ecto.Type
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
+  alias EctoCSV.Loader.Header
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -22,75 +23,16 @@ defmodule EctoCSV.Loader do
   """
   def load(stream, schema) do
     stream
-    |> extract_headers(schema)
-    |> decode
-    |> to_struct_stream
-  end
-
-  defp extract_headers(stream, schema) do
-    extract_headers stream, schema, file_has_header?(schema)
-  end
-
-  defp extract_headers(stream, schema, true) do
-    {stream |> remove_header, schema, file_headers(stream, schema)}
-  end
-
-  defp extract_headers(stream, schema, false) do
-    {stream, schema, headers(schema)}
-  end
-
-  defp file_headers(stream, schema) do
-    stream
+    |> Header.extract_headers(schema)
     |> decode(schema)
-    |> take_header
-    |> ensure_valid_headers(schema)
+    |> to_struct_stream(schema)
   end
 
-  defp take_header(stream) do
-    stream |> Enum.take(1) |> List.first |> to_atom
+  defp decode({stream, headers}, schema) do
+    {CSV.decode(stream, schema), headers}
   end
 
-  defp ensure_valid_headers(headers, schema) do    
-    if Enum.filter(headers, &(String.length(Atom.to_string(&1)) == 0)) |> length > 0 do
-      raise LoadError.exception(line: 1, message: "blank header found")
-    end
-
-    if length(missing = headers(schema) -- headers) > 0 do
-      missing = Enum.join(missing, ",")
-      raise LoadError.exception(line: 1, message: "missing headers '#{missing}'")
-    end
-
-    if length(duplicates = headers -- Enum.uniq(headers)) > 0 do
-      duplicates = Enum.uniq(duplicates) |> Enum.join(",")
-      raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicates}' found")
-    end
-
-    if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
-      extras = Enum.join(headers -- headers(schema), ",")
-      raise LoadError.exception(line: 1, message: "extra headers '#{extras}' found")
-    end
-
-    headers
-  end
-
-  defp remove_header(stream) do
-    Stream.transform(stream, 0, fn struct, index -> 
-      case index do
-        0 -> {[],       :ignore_header}
-        _ -> {[struct], :process_stream}
-      end
-    end)
-  end
-
-  defp decode(stream, schema) do
-    CSV.decode(stream, schema)
-  end
-
-  defp decode({stream, schema, headers}) do
-    {CSV.decode(stream, schema), schema, headers}
-  end
-
-  defp to_struct_stream({stream, schema, headers}) do
+  defp to_struct_stream({stream, headers}, schema) do
     stream
     |> Stream.map(&validate_row({&1, schema, headers}))
     |> Stream.map(&convert_to_tuples(&1))
@@ -120,11 +62,11 @@ defmodule EctoCSV.Loader do
     headers ++ to_atom(extra_headers)
   end
 
-  defp convert_to_tuples({values, schema, headers}) do
+  defp convert_to_tuples({values, _schema, headers}) do
     Enum.zip(headers, values)
   end
 
-  defp load_row(tuples, schema, headers) do
+  defp load_row(tuples, schema, _headers) do
     tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
   end
 
@@ -135,10 +77,6 @@ defmodule EctoCSV.Loader do
     else
       struct
     end
-  end
-
-  defp file_has_header?(schema) do
-    schema.__csv__ :file_has_header?
   end
 
   defp headers(schema) do
@@ -163,9 +101,5 @@ defmodule EctoCSV.Loader do
     rescue ArgumentError -> 
       String.to_atom(string)
     end
-  end
-
-  defp to_atom(atom) when is_atom(atom) do
-    atom
   end
 end
