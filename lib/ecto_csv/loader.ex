@@ -1,4 +1,5 @@
 defmodule EctoCSV.Loader do
+  alias Ecto.Type
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
 
@@ -26,18 +27,6 @@ defmodule EctoCSV.Loader do
     |> to_struct_stream
   end
 
-  defp file_has_header?(schema) do
-    schema.__csv__ :file_has_header?
-  end
-
-  defp headers(schema) do
-    schema.__csv__ :headers
-  end
-
-  defp extra_columns(schema) do
-    schema.__csv__ :extra_columns
-  end
-
   defp extract_headers(stream, schema) do
     extract_headers stream, schema, file_has_header?(schema)
   end
@@ -54,9 +43,9 @@ defmodule EctoCSV.Loader do
     stream
     |> decode(schema)
     |> take_header
+    |> to_atom
     |> ensure_valid_headers(schema)
     |> maybe_add_extra_headers(schema)
-    |> to_atom
   end
 
   defp take_header(stream) do
@@ -64,11 +53,11 @@ defmodule EctoCSV.Loader do
   end
 
   defp ensure_valid_headers(headers, schema) do    
-    if Enum.filter(headers, &(String.length(&1) == 0)) |> length > 0 do
+    if Enum.filter(headers, &(String.length(Atom.to_string(&1)) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
     end
 
-    if length(missing = headers(schema) -- to_atom(headers)) > 0 do
+    if length(missing = headers(schema) -- headers) > 0 do
       missing = Enum.join(missing, ",")
       raise LoadError.exception(line: 1, message: "missing headers '#{missing}'")
     end
@@ -79,7 +68,7 @@ defmodule EctoCSV.Loader do
     end
 
     if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
-      extras = Enum.join(to_atom(headers) -- headers(schema), ",")
+      extras = Enum.join(headers -- headers(schema), ",")
       raise LoadError.exception(line: 1, message: "extra headers '#{extras}' found")
     end
 
@@ -119,7 +108,7 @@ defmodule EctoCSV.Loader do
   end
 
   defp validate_row({values, schema, headers}) do
-    case schema.__csv__(:extra_columns) do
+    case extra_columns(schema) do
       :retain -> {values, schema, create_headers_with_extras(headers, values)}
       :ignore -> {remove_extra_values(headers, values), schema, headers}
       :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
@@ -150,10 +139,25 @@ defmodule EctoCSV.Loader do
   end
 
   defp load_value({field, value}, struct, schema) do
-    type = schema.__schema__(:type, field) || :string
-    {:ok, value} = Ecto.Type.cast(type, value)
+    {:ok, value} = Type.cast(type(schema, field), value)
     Map.put(struct, field, value)
-end
+  end
+
+  defp file_has_header?(schema) do
+    schema.__csv__ :file_has_header?
+  end
+
+  defp headers(schema) do
+    schema.__csv__ :headers
+  end
+
+  defp extra_columns(schema) do
+    schema.__csv__ :extra_columns
+  end
+
+  defp type(schema, field) do
+    schema.__schema__(:type, field) || :string
+  end
 
   defp to_atom(list) when is_list(list) do
     list |> Enum.map(&to_atom(&1))
