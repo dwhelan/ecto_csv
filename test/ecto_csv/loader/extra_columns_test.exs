@@ -25,10 +25,16 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
   end
 
   describe "that by default with a non-empty schema" do
+    test "missing headers raises an error" do
+      assert_raise LoadError, "missing headers 'a' on line 1", fn ->
+        load ["x", "1"], Default
+      end 
+    end
+
     test "headers not defined in the schema have values loaded as strings" do
       assert %{a: "1", x: "2"} = load ["a,x", "1,2"], Default
     end
-    
+
     test "more fields than headers should dynamicaly create a new header" do
       assert %{a: "1", x: "2", Field3: "3"} = load ["a,x", "1,2,3"], Default
     end

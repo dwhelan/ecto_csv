@@ -17,15 +17,15 @@ defmodule EctoCSV.Loader.StreamTest do
 
   describe "load from stream" do
     test "fields with no data type gets a type of 'string'" do
-      assert [%Example{a: "1"}] = load(["a", "1"])
+      assert [%Example{a: "1"}] = load(["a,b,c", "1,2,3.4"])
     end
 
     test "values are converted to the defined data type" do
-      assert [%Example{b: 2}] = load(["a,b", "1,2"])
+      assert [%Example{b: 2, c: 3.4}] = load(["a,b,c", "1,2,3.4"])
     end
 
     test "multiple rows can be loaded" do
-      assert [%Example{a: "1"}, %Example{a: "2"}] = load(["a", "1", "2"])
+      assert [%Example{a: "1", b: 2, c: 3.4}, %Example{a: "5", b: 6, c: 7.8}] = load(["a,b,c", "1,2,3.4", "5,6,7.8"])
     end
 
     test "multiple fields per row can be loaded" do

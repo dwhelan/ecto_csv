@@ -30,13 +30,13 @@ defmodule EctoCSV.Loader.HeaderTest do
 
   test "that an error will be raised if a duplicate header is found" do
     assert_raise LoadError, "duplicate headers 'a' found on line 1", fn ->
-      load(["a,a", "2,1"], Default)
+      load(["a,a,b", "1,2,3"], Default)
    end
   end
 
   test "that an error will be raised if multiple duplicates headers are found" do
     assert_raise LoadError, "duplicate headers 'a' found on line 1", fn ->
-      load(["a,a,a", "2,2,2"], Default)
+      load(["a,a,a,b", "2,2,2,3"], Default)
    end
   end
 

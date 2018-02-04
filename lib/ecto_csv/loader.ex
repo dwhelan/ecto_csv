@@ -63,9 +63,14 @@ defmodule EctoCSV.Loader do
     stream |> Enum.take(1) |> List.first
   end
 
-  defp ensure_valid_headers(headers, schema) do
+  defp ensure_valid_headers(headers, schema) do    
     if Enum.filter(headers, &(String.length(&1) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
+    end
+
+    if length(missing = headers(schema) -- to_atom(headers)) > 0 do
+      missing = Enum.join(missing, ",")
+      raise LoadError.exception(line: 1, message: "missing headers '#{missing}'")
     end
 
     if length(duplicates = headers -- Enum.uniq(headers)) > 0 do
