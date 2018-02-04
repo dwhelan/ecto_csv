@@ -2,13 +2,11 @@
 * handle header row with blank cells (allow code to specify name or field number)
 
 * loader
-    * file with headers - validate they match schema? use to map, missing, extra
     * get line numbers for error messages
+    * allow missing columns: missing_columns :ignore, :error, [list of columns allowed to be missing]
     * handle an "id" key
     * load!
     * import with no schema -> create map
-    * import with empty schema -> create struct
-    * load streams without headers
     * load from string with \n's and split (could be tricky to handle \n within strings)
 
 * dumper

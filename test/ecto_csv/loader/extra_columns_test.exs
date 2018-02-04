@@ -35,7 +35,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
       assert %{a: "1", x: "2"} = load ["a,x", "1,2"], Default
     end
 
-    test "more fields than headers should dynamicaly create a new header" do
+    test "more fields than headers should dynamically create a new header" do
       assert %{a: "1", x: "2", Field3: "3"} = load ["a,x", "1,2,3"], Default
     end
   end
@@ -64,6 +64,10 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
       struct = load ["a,x", "1,2"], Ignore
       assert %{a: "1"} = struct
       refute Map.has_key? struct, :x
+    end
+
+    test "fields should be assigned in header order" do
+      assert %{a: "2"} = load ["x,a", "1,2"], Ignore
     end
   end
 

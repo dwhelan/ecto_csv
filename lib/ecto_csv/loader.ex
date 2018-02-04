@@ -43,13 +43,11 @@ defmodule EctoCSV.Loader do
     stream
     |> decode(schema)
     |> take_header
-    |> to_atom
     |> ensure_valid_headers(schema)
-    |> maybe_add_extra_headers(schema)
   end
 
   defp take_header(stream) do
-    stream |> Enum.take(1) |> List.first
+    stream |> Enum.take(1) |> List.first |> to_atom
   end
 
   defp ensure_valid_headers(headers, schema) do    
@@ -73,14 +71,6 @@ defmodule EctoCSV.Loader do
     end
 
     headers
-  end
-
-  defp maybe_add_extra_headers(headers, schema) do
-    if length(headers) > length(headers(schema)) and extra_columns(schema) == :ignore do
-      headers(schema)
-    else 
-      headers
-    end
   end
 
   defp remove_header(stream) do
@@ -139,8 +129,12 @@ defmodule EctoCSV.Loader do
   end
 
   defp load_value({field, value}, struct, schema) do
-    {:ok, value} = Type.cast(type(schema, field), value)
-    Map.put(struct, field, value)
+    if Enum.member?(headers(schema), field) || extra_columns(schema) == :retain do
+      {:ok, value} = Type.cast(type(schema, field), value)
+      Map.put(struct, field, value)
+    else
+      struct
+    end
   end
 
   defp file_has_header?(schema) do
