@@ -22,34 +22,38 @@ defmodule EctoCSV.Loader do
 
   """
   def load(stream, schema) do
+    {stream, headers} = extract_headers(stream, schema)
+
     stream
-    |> extract_headers(schema)
     |> decode(schema)
-    |> validate_row(schema)
-    |> create_key_value_tuples(schema)
+    |> validate_row(headers, schema)
+    |> create_key_value_tuples(headers, schema)
     |> load_row(schema)
   end
 
   defp extract_headers(stream, schema) do
-    Header.extract_headers(stream, schema)
+    if file_has_header?(schema) do
+      {Header.remove_header(stream), Header.file_headers(stream, schema)}
+    else
+      {stream, headers(schema)}
+    end
   end
 
-  defp decode({stream, headers}, schema) do
-    {CSV.decode(stream, schema), headers}
+  defp decode(stream, schema) do
+    CSV.decode(stream, schema)
   end
 
-  defp validate_row({stream, headers}, schema) do
-    stream = Stream.map(stream, fn values ->
+  defp validate_row(stream, headers, schema) do
+    Stream.map(stream, fn values ->
       if length(values) > length(headers) and extra_columns(schema) == :error do
         extras = Enum.drop(values, length(headers))
         raise LoadError.exception(line: 2, message: "extra fields '#{extras}' found")
       end
       values
     end)
-    {stream, headers}
   end
 
-  defp create_key_value_tuples({stream, headers}, schema) do
+  defp create_key_value_tuples(stream, headers, schema) do
     Stream.map(stream, fn values ->
       values = maybe_remove_extra_values(values, headers, extra_columns(schema))
       keys   = maybe_add_extra_keys(values, headers, extra_columns(schema))
@@ -100,6 +104,10 @@ defmodule EctoCSV.Loader do
     else
       struct
     end
+  end
+
+  defp file_has_header?(schema) do
+    schema.__csv__ :file_has_header?
   end
 
   defp headers(schema) do

@@ -2,19 +2,7 @@ defmodule EctoCSV.Loader.Header do
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
 
-  def extract_headers(stream, schema) do
-    extract_headers stream, schema, file_has_header?(schema)
-  end
-
-  defp extract_headers(stream, schema, true) do
-    {stream |> remove_header, file_headers(stream, schema)}
-  end
-
-  defp extract_headers(stream, schema, false) do
-    {stream, headers(schema)}
-  end
-
-  defp remove_header(stream) do
+  def remove_header(stream) do
     Stream.transform(stream, 0, fn struct, index -> 
       case index do
         0 -> {[],       :ignore_header}
@@ -23,11 +11,15 @@ defmodule EctoCSV.Loader.Header do
     end)
   end
 
-  defp file_headers(stream, schema) do
+  def file_headers(stream, schema) do
     stream
     |> decode(schema)
     |> take_header
     |> ensure_valid_headers(schema)
+  end
+
+  defp decode(stream, schema) do
+    CSV.decode(stream, schema)
   end
 
   defp take_header(stream) do
@@ -55,14 +47,6 @@ defmodule EctoCSV.Loader.Header do
     end
 
     headers
-  end
-
-  defp decode(stream, schema) do
-    CSV.decode(stream, schema)
-  end
-
-  defp file_has_header?(schema) do
-    schema.__csv__ :file_has_header?
   end
 
   defp headers(schema) do
