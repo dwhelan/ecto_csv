@@ -7,7 +7,7 @@ defmodule EctoCSV.Adapters.CSV do
     |> Stream.map(fn {:ok, list} -> list end)
   end  
   
-  def encode(stream,schema) do
+  def encode(stream, schema) do
     stream
     |> Elixir.CSV.encode(options(schema))
   end

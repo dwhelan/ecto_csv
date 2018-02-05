@@ -24,7 +24,6 @@ defmodule EctoCSV.Loader.ExtraColumnsWithoutHeadersTest do
     end
   end
 
-  @tag :focus
   test "with :ignore extra values should be ignored" do
     loaded = load ["1,2,3"], Ignore
     assert %{a: "1"} = loaded
