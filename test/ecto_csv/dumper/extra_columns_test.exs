@@ -11,7 +11,6 @@ defmodule EctoCSV.Dumper.ExtraColumnsTest do
     csv do end 
   end
 
-  # @tag :wip
   test "should dump extra columns by default" do
     default = %Default{a: "1", b: "2"}
     assert ["a,b\r\n", "1,2\r\n"] = dump default

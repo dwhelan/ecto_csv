@@ -104,7 +104,6 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
       end 
     end
 
-    @tag :skip
     test "extra fields in third row should raise an error" do
       assert_raise LoadError, "extra fields '2' found on line 3", fn ->
         load_all ["a", "1", "1,2"], Error

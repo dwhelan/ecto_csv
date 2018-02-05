@@ -1,7 +1,7 @@
 defmodule EctoCSV.Loader do
   alias Ecto.Type
-  require EctoCSV.Adapters.Nimble, as: CSV
   alias EctoCSV.Adapters.CSV
+  require EctoCSV.Adapters.Nimble, as: CSV
   alias EctoCSV.LoadError
   alias EctoCSV.Loader.Header
 
@@ -45,10 +45,17 @@ defmodule EctoCSV.Loader do
   end
 
   defp validate_row(stream, headers, schema) do
-    Stream.map(stream, fn values ->
+    line_offset = case file_has_header?(schema) do
+      true  -> 2
+      false -> 1
+    end
+
+    stream
+    |> Stream.with_index(line_offset)
+    |> Stream.map(fn {values, line} ->
       if length(values) > length(headers) and extra_columns(schema) == :error do
         extras = Enum.drop(values, length(headers))
-        raise LoadError.exception(line: 2, message: "extra fields '#{extras}' found")
+        raise LoadError.exception(line: line, message: "extra fields '#{extras}' found")
       end
       values
     end)
