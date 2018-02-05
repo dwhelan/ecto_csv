@@ -133,16 +133,16 @@ defmodule EctoCSV.Loader do
     schema.__csv__ :extra_columns
   end
 
+  defp type(schema, field) do
+    schema.__schema__(:type, field) || :string
+  end
+
   defp separator(schema) do
     schema.__csv__ :separator
   end
 
   defp delimiter(schema) do
     schema.__csv__ :delimiter
-  end
-
-  defp type(schema, field) do
-    schema.__schema__(:type, field) || :string
   end
 
   defp to_atom(list) when is_list(list) do

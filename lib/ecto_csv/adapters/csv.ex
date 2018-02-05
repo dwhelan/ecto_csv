@@ -2,25 +2,15 @@ defmodule EctoCSV.Adapters.CSV do
   require CSV
 
   def read(stream, options) do
-    Elixir.CSV.decode(stream, options2(options))
+    Elixir.CSV.decode(stream, adaptor(options))
     |> Stream.map(fn {:ok, list} -> list end)
   end
 
-  def write(stream, schema) do
-    Elixir.CSV.encode(stream, options(schema))
+  def write(stream, options) do
+    Elixir.CSV.encode(stream, adaptor(options))
   end
 
-  defp options2(options) do
-    [
-      separator: hd(String.to_charlist(options[:separator])),
-      delimiter: options[:delimiter]
-    ]
-  end
-
-  defp options(schema) do
-    [
-      separator: hd(String.to_charlist(schema.__csv__(:separator))),
-      delimiter: schema.__csv__(:delimiter)
-    ]
+  defp adaptor(options) do
+    Keyword.update!(options, :separator, &String.to_charlist(&1) |> List.first)
   end
 end

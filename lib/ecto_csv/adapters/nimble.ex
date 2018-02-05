@@ -29,6 +29,14 @@ defmodule EctoCSV.Adapters.Nimble do
     EctoCSV.Adapters.Nimble.Custom
   end
 
+  defp options2(options) do
+    [
+      separator: hd(String.to_charlist(options[:separator])),
+      delimiter: options[:delimiter]
+    ]
+  end
+
+
   defp options(schema) do
     [
       separator: schema.__csv__(:separator)

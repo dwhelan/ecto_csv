@@ -22,7 +22,7 @@ defmodule EctoCSV.Dumper do
   end  
 
   defp write(stream, schema) do
-    CSV.write(stream, schema)
+    CSV.write(stream, options(schema))
   end
 
   defp row_values(struct, index) do
@@ -51,6 +51,21 @@ defmodule EctoCSV.Dumper do
 
   defp reject_meta_keys keys do
     Enum.reject keys, &meta_key?(&1)
+  end
+
+  defp options(schema) do
+    [
+      separator: separator(schema),
+      delimiter: delimiter(schema)
+    ]
+  end
+
+  defp separator(schema) do
+    schema.__csv__ :separator
+  end
+
+  defp delimiter(schema) do
+    schema.__csv__ :delimiter
   end
 
   defp meta_key?(:id),                     do: true
