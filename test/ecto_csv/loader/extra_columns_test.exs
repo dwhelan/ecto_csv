@@ -94,7 +94,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
   describe "that with 'extra_columns :error' and a non-empty schema" do
     test "headers not defined in the schema should raise an error" do
       assert_raise LoadError, "extra headers 'x' found on line 1", fn ->
-        load ["a,x", "1,2"], Error
+        load ["a,x", "1"], Error
       end 
     end
 

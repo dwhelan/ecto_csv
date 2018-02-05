@@ -23,12 +23,15 @@ defmodule EctoCSV.Loader do
   """
   def load(stream, schema) do
     stream
-    |> Header.extract_headers(schema)
+    |> extract_headers(schema)
     |> decode(schema)
     |> validate_row(schema)
-    |> assign_keys(schema)
-    |> convert_to_tuples()
+    |> create_key_value_tuples(schema)
     |> load_row(schema)
+  end
+
+  defp extract_headers(stream, schema) do
+    Header.extract_headers(stream, schema)
   end
 
   defp decode({stream, headers}, schema) do
@@ -43,20 +46,29 @@ defmodule EctoCSV.Loader do
     {stream, headers}
   end
 
-  defp assign_keys({stream, headers}, schema) do
-    Stream.map(stream, fn values -> 
-      if extra_columns(schema) == :ignore do
-        {remove_extra_values(headers, values), headers}
-      else
-        {values, create_headers_with_extras(headers, values)}
-      end
+  defp create_key_value_tuples({stream, headers}, schema) do
+    Stream.map(stream, fn values ->
+      values = maybe_remove_extra_values(values, headers, extra_columns(schema))
+      keys   = maybe_add_extra_keys(values, headers, extra_columns(schema))
+      
+      Enum.zip(keys, values)
     end)
   end
 
-  defp convert_to_tuples(stream) do
-    Stream.map(stream, fn {values, headers} -> 
-      Enum.zip(headers, values)
-    end)
+  defp maybe_remove_extra_values(values, headers, :ignore) do
+    remove_extra_values(headers, values)
+  end
+
+  defp maybe_remove_extra_values(values, _, _) do
+    values
+  end
+
+  defp maybe_add_extra_keys(_, headers, :ignore) do
+    headers
+  end
+
+  defp maybe_add_extra_keys(values, headers, _) do
+    create_headers_with_extras(headers, values)
   end
 
   defp remove_extra_values([], values) do
