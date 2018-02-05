@@ -39,10 +39,13 @@ defmodule EctoCSV.Loader do
   end
 
   defp validate_row({stream, headers}, schema) do
-    if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
-      extras = Enum.join(headers -- headers(schema), ",")
-      raise LoadError.exception(line: 1, message: "extra headers '#{extras}' found")
-    end
+    stream = Stream.map(stream, fn values ->
+      if length(values) > length(headers) and extra_columns(schema) == :error do
+        extras = Enum.drop(values, length(headers))
+        raise LoadError.exception(line: 2, message: "extra fields '#{extras}' found")
+      end
+      values
+    end)
     {stream, headers}
   end
 
