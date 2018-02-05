@@ -2,14 +2,12 @@ defmodule EctoCSV.Adapters.CSV do
   require CSV
 
   def decode(stream, schema) do
-    stream
-    |> Elixir.CSV.decode(options(schema))
+    Elixir.CSV.decode(stream, options(schema))
     |> Stream.map(fn {:ok, list} -> list end)
-  end  
-  
+  end
+
   def encode(stream, schema) do
-    stream
-    |> Elixir.CSV.encode(options(schema))
+    Elixir.CSV.encode(stream, options(schema))
   end
 
   defp options(schema) do
