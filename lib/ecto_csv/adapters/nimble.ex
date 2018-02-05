@@ -7,39 +7,25 @@ defmodule EctoCSV.Adapters.Nimble do
   alias EctoCSV.Adapters.Nimble.PipeSeparator
   alias EctoCSV.Adapters.Nimble.TabSeparator
 
-  def read(stream, schema) do
-    nimble_for(schema).parse_stream(stream, headers: false)
+  def read(stream, options) do
+    nimble_for(options).parse_stream(stream, headers: false)
   end
 
-  def write(stream, schema) do
-    nimble_for(schema).dump_to_stream(stream)
+  def write(stream, options) do
+    nimble_for(options).dump_to_stream(stream)
   end
 
-  defp nimble_for(schema) do
-    case options(schema)[:separator] do
+  defp nimble_for(options) do
+    case options[:separator] do
       ","  -> CommaSeparator
       "|"  -> PipeSeparator
       "\t" -> TabSeparator
-      _    -> custom_for(schema)
+      _    -> custom_for(options)
     end
   end
 
-  defp custom_for(schema) do
-    NimbleCSV.define(EctoCSV.Adapters.Nimble.Custom, options(schema))
+  defp custom_for(options) do
+    NimbleCSV.define(EctoCSV.Adapters.Nimble.Custom, options)
     EctoCSV.Adapters.Nimble.Custom
-  end
-
-  defp options2(options) do
-    [
-      separator: hd(String.to_charlist(options[:separator])),
-      delimiter: options[:delimiter]
-    ]
-  end
-
-
-  defp options(schema) do
-    [
-      separator: schema.__csv__(:separator)
-    ]
   end
 end

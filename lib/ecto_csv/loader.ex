@@ -1,7 +1,7 @@
 defmodule EctoCSV.Loader do
   alias Ecto.Type
-  require EctoCSV.Adapters.Nimble, as: CSV
   alias EctoCSV.Adapters.CSV
+  require EctoCSV.Adapters.Nimble, as: CSV
   alias EctoCSV.LoadError
   alias EctoCSV.Loader.Header
 
