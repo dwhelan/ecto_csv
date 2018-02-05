@@ -36,12 +36,15 @@ defmodule EctoCSV.Loader do
 
   defp validate_row({stream, headers}, schema) do
     Stream.map(stream, fn values -> 
-      case extra_columns(schema) do
-        :retain -> {values, create_headers_with_extras(headers, values)}
-        :ignore -> {remove_extra_values(headers, values), headers}
-        :error  -> extra_values = Enum.join(remove_extra_values(headers, values), ",")
-                   raise LoadError.exception(line: 1, message: "extra fields '#{extra_values}' found")
-        _       -> {values, headers}
+      if length(headers) > length(headers(schema)) and extra_columns(schema) == :error do
+        extras = Enum.join(headers -- headers(schema), ",")
+        raise LoadError.exception(line: 1, message: "extra headers '#{extras}' found")
+      end
+    
+      if extra_columns(schema) == :ignore do
+        {remove_extra_values(headers, values), headers}
+      else
+        {values, create_headers_with_extras(headers, values)}
       end
     end)
   end
@@ -55,8 +58,8 @@ defmodule EctoCSV.Loader do
   end
 
   defp create_headers_with_extras(headers, values) do
-    extra_headers = for x <- length(headers)..length(values), do: Enum.join(["Field", to_string(x+1)])
-    headers ++ to_atom(extra_headers)
+    extra_headers = for i <- length(headers)..length(values), do: to_atom("Field#{i+1}")
+    headers ++ extra_headers
   end
 
   defp convert_to_tuples(stream) do

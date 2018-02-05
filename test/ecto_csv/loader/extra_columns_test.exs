@@ -97,6 +97,10 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
         load ["a,x", "1,2"], Error
       end 
     end
+
+    test "valid headers and rows should not raise an error" do
+      assert %{a: "1"} = load ["a", "1"], Error
+    end
   end
 
   defp load(lines, schema) do
