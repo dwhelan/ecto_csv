@@ -30,17 +30,17 @@ defmodule EctoCSV.Loader.ExtraColumnsWithoutHeadersTest do
     refute Map.has_key?(loaded, :Field1)
   end
 
-  # defmodule Error do
-  #   use EctoCSV.Schema
-  #   schema "test" do end
-  #   csv do extra_columns :error end
-  # end
+  defmodule Error do
+    use EctoCSV.Schema
+    schema "test" do end
+    csv do extra_columns :error end
+  end
 
-  # test "headers not defined in the schema should raise an error if extra_columns set to :error" do
-  #   assert_raise LoadError, "extra column 'x' found on line 1", fn ->
-  #      load ["x", "1"], Error
-  #   end 
-  # end
+  test "headers not defined in the schema should raise an error if extra_columns set to :error" do
+    assert_raise LoadError, "extra headers 'x' found on line 1", fn ->
+       load ["x", "1"], Error
+    end 
+  end
 
   defp load(lines, schema) do
     EctoCSV.Loader.load(lines, schema) |> Enum.take(1) |> List.first
