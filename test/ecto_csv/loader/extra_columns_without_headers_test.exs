@@ -30,11 +30,6 @@ defmodule EctoCSV.Loader.ExtraColumnsWithoutHeadersTest do
     refute Map.has_key?(loaded, :Field1)
   end
 
-  # test "headers not defined in the schema should be ignored if extra_columns set to :ignore" do
-  #   struct = load ["x", "1"], Ignore
-  #   refute Map.has_key? struct, :x
-  # end
-
   # defmodule Error do
   #   use EctoCSV.Schema
   #   schema "test" do end
