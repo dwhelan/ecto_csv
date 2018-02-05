@@ -19,7 +19,14 @@ defmodule EctoCSV.Loader.Header do
   end
 
   defp read(stream, schema) do
-    CSV.read(stream, schema)
+    CSV.read(stream, options(schema))
+  end
+
+  defp options(schema) do
+    [
+      separator: separator(schema),
+      delimiter: delimiter(schema)
+    ]
   end
 
   defp take_header(stream) do
@@ -55,6 +62,14 @@ defmodule EctoCSV.Loader.Header do
 
   defp extra_columns(schema) do
     schema.__csv__ :extra_columns
+  end
+
+  defp separator(schema) do
+    schema.__csv__ :separator
+  end
+
+  defp delimiter(schema) do
+    schema.__csv__ :delimiter
   end
 
   defp to_atom(list) when is_list(list) do

@@ -1,7 +1,7 @@
 defmodule EctoCSV.Loader do
   alias Ecto.Type
-  alias EctoCSV.Adapters.CSV
   require EctoCSV.Adapters.Nimble, as: CSV
+  alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
   alias EctoCSV.Loader.Header
 
@@ -41,7 +41,14 @@ defmodule EctoCSV.Loader do
   end
 
   defp read(stream, schema) do
-    CSV.read(stream, schema)
+    CSV.read(stream, options(schema))
+  end
+
+  defp options(schema) do
+    [
+      separator: separator(schema),
+      delimiter: delimiter(schema)
+    ]
   end
 
   defp validate_row(stream, headers, schema) do
@@ -124,6 +131,14 @@ defmodule EctoCSV.Loader do
 
   defp extra_columns(schema) do
     schema.__csv__ :extra_columns
+  end
+
+  defp separator(schema) do
+    schema.__csv__ :separator
+  end
+
+  defp delimiter(schema) do
+    schema.__csv__ :delimiter
   end
 
   defp type(schema, field) do

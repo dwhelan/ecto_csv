@@ -20,7 +20,7 @@ defmodule EctoCSV.Adapters.Nimble do
       ","  -> CommaSeparator
       "|"  -> PipeSeparator
       "\t" -> TabSeparator
-      _   -> custom_for(schema)
+      _    -> custom_for(schema)
     end
   end
 
