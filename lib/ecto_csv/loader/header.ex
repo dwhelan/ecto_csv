@@ -13,13 +13,13 @@ defmodule EctoCSV.Loader.Header do
 
   def file_headers(stream, schema) do
     stream
-    |> decode(schema)
+    |> read(schema)
     |> take_header
     |> ensure_valid_headers(schema)
   end
 
-  defp decode(stream, schema) do
-    CSV.decode(stream, schema)
+  defp read(stream, schema) do
+    CSV.read(stream, schema)
   end
 
   defp take_header(stream) do

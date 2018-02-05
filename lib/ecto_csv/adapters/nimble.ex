@@ -3,11 +3,11 @@ defmodule EctoCSV.Adapters.Nimble do
   NimbleCSV.define(EctoCSV.Adapters.Nimble.Custom, separator: ",", escape: "\"")
   alias EctoCSV.Adapters.Nimble.Custom
 
-  def decode(stream, schema) do
+  def read(stream, schema) do
     create_custom_nimble(schema).parse_stream(stream, headers: false)
   end
 
-  def encode(stream, schema) do
+  def write(stream, schema) do
     create_custom_nimble(schema).dump_to_stream(stream)
   end
 

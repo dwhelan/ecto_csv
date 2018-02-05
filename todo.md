@@ -2,7 +2,6 @@
 * handle header row with blank cells (allow code to specify name or field number)
 
 * loader
-    * get line numbers for error messages
     * allow missing columns: missing_columns :ignore, :error, [list of columns allowed to be missing]
     * handle an "id" key
     * load!

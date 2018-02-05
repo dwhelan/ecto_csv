@@ -26,7 +26,7 @@ defmodule EctoCSV.Loader do
     {stream, headers} = extract_headers(stream, schema)
 
     stream
-    |> decode(schema)
+    |> read(schema)
     |> validate_row(headers, schema)
     |> create_key_value_tuples(headers, schema)
     |> load_row(schema)
@@ -40,8 +40,8 @@ defmodule EctoCSV.Loader do
     end
   end
 
-  defp decode(stream, schema) do
-    CSV.decode(stream, schema)
+  defp read(stream, schema) do
+    CSV.read(stream, schema)
   end
 
   defp validate_row(stream, headers, schema) do

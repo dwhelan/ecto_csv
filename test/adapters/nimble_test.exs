@@ -28,14 +28,14 @@ defmodule EctoCSV.Adapters.NimbleTest do
     end
   end
 
-  describe "that decode" do
-    test "should decode with comma as the separator" do
-      lines = CSV.decode(["a,b", "1,2"], Default) |> Enum.to_list
+  describe "that read" do
+    test "should read with comma as the separator" do
+      lines = CSV.read(["a,b", "1,2"], Default) |> Enum.to_list
       assert lines == [["a", "b"], ["1", "2"]]
     end
 
-    test "should decode with '|' as the separator" do
-      lines = CSV.decode(["a|b", "1|2"], Pipe) |> Enum.to_list
+    test "should read with '|' as the separator" do
+      lines = CSV.read(["a|b", "1|2"], Pipe) |> Enum.to_list
       assert lines == [["a", "b"], ["1", "2"]]
     end
   end

@@ -9,7 +9,7 @@ defmodule EctoCSV.Dumper do
     schema = extract_schema(stream)
     stream
     |> to_values
-    |> to_csv(schema)
+    |> write(schema)
   end
 
   defp to_values(stream) do
@@ -21,8 +21,8 @@ defmodule EctoCSV.Dumper do
     struct.__struct__
   end  
 
-  defp to_csv(stream,schema) do
-    stream |> CSV.encode(schema)
+  defp write(stream, schema) do
+    CSV.write(stream, schema)
   end
 
   defp row_values(struct, index) do
