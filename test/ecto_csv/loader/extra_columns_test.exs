@@ -2,7 +2,7 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
   alias EctoCSV.LoadError
   use ExUnit.Case
 
-  defmodule EmptyDefault do
+  defmodule RetainDefault do
     use EctoCSV.Schema
     schema "test" do end
     csv do end
@@ -10,33 +10,33 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
 
   describe "that by default with an empty schema" do
     test "headers not defined in the schema have values loaded as strings" do
-      assert %{x: "1"} = load ["x", "1"], EmptyDefault
+      assert %{x: "1"} = load ["x", "1"], RetainDefault
     end
     
     test "more fields than headers should dynamicaly create a new header" do
-      assert %{x: "1", Field2: "2"} = load ["x", "1,2"], EmptyDefault
+      assert %{x: "1", Field2: "2"} = load ["x", "1,2"], RetainDefault
     end
   end
 
-  defmodule Default do
+  defmodule Retain do
     use EctoCSV.Schema
     schema "test" do field :a end
-    csv do end
+    csv do extra_columns :retain end
   end
 
   describe "that by default with a non-empty schema" do
     test "missing headers raises an error" do
       assert_raise LoadError, "missing headers 'a' on line 1", fn ->
-        load ["x", "1"], Default
+        load ["x", "1"], Retain
       end 
     end
 
     test "headers not defined in the schema have values loaded as strings" do
-      assert %{a: "1", x: "2"} = load ["a,x", "1,2"], Default
+      assert %{a: "1", x: "2"} = load ["a,x", "1,2"], Retain
     end
 
     test "more fields than headers should dynamically create a new header" do
-      assert %{a: "1", x: "2", Field3: "3"} = load ["a,x", "1,2,3"], Default
+      assert %{a: "1", x: "2", Field3: "3"} = load ["a,x", "1,2,3"], Retain
     end
   end
 
