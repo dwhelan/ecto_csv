@@ -35,6 +35,23 @@ defmodule EctoCSV.Dumper.ExtraColumnsTest do
     assert ["a,z\r\n", "1,2\r\n"] = dump ignore
   end
 
+  defmodule Error do
+    use EctoCSV.Schema
+    schema "test" do
+      field :a
+      field :z
+    end
+
+    csv do
+      extra_columns :error
+    end 
+  end
+
+  test "should ignore extra columns if extra_columns is ':error'" do
+    error = Map.put(%Ignore{a: "1", z: "2"}, :c, "3")
+    assert ["a,z\r\n", "1,2\r\n"] = dump error
+  end
+
   defp dump(lines) do
     EctoCSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
   end

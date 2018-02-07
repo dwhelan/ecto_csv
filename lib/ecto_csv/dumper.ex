@@ -77,7 +77,6 @@ defmodule EctoCSV.Dumper do
     schema.__csv__ :extra_columns
   end
 
-
   defp separator(schema) do
     schema.__csv__ :separator
   end
