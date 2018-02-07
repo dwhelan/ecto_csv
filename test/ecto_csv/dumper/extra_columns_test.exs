@@ -5,7 +5,7 @@ defmodule EctoCSV.Dumper.ExtraColumnsTest do
     use EctoCSV.Schema
     schema "test" do
       field :a
-      field :b
+      field :z
     end
 
     csv do
@@ -13,9 +13,26 @@ defmodule EctoCSV.Dumper.ExtraColumnsTest do
     end 
   end
 
-  test "should write extra columns if extra_columns is ':retain'" do
-    default = Map.put(%Retain{a: "1", b: "2"}, :c, "3")
-    assert ["a,b,c\r\n", "1,2,3\r\n"] = dump default
+  test "should write extra columns after schema headers if extra_columns is ':retain'" do
+    retain = Map.put(%Retain{a: "1", z: "2"}, :c, "3")
+    assert ["a,z,c\r\n", "1,2,3\r\n"] = dump retain
+  end
+
+  defmodule Ignore do
+    use EctoCSV.Schema
+    schema "test" do
+      field :a
+      field :z
+    end
+
+    csv do
+      extra_columns :ignore
+    end 
+  end
+
+  test "should ignore extra columns if extra_columns is ':ignore'" do
+    ignore = Map.put(%Ignore{a: "1", z: "2"}, :c, "3")
+    assert ["a,z\r\n", "1,2\r\n"] = dump ignore
   end
 
   defp dump(lines) do
