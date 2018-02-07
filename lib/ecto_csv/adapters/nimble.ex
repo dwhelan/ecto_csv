@@ -20,12 +20,6 @@ defmodule EctoCSV.Adapters.Nimble do
       ","  -> CommaSeparator
       "|"  -> PipeSeparator
       "\t" -> TabSeparator
-      _    -> custom_for(options)
     end
-  end
-
-  defp custom_for(options) do
-    NimbleCSV.define(EctoCSV.Adapters.Nimble.Custom, options)
-    EctoCSV.Adapters.Nimble.Custom
   end
 end
