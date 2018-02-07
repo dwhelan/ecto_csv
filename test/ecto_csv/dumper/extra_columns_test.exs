@@ -1,19 +1,21 @@
 defmodule EctoCSV.Dumper.ExtraColumnsTest do
   use ExUnit.Case
 
-  defmodule Default do
+  defmodule Retain do
     use EctoCSV.Schema
     schema "test" do
       field :a
       field :b
     end
 
-    csv do end 
+    csv do
+      extra_columns :retain
+    end 
   end
 
-  test "should dump extra columns by default" do
-    default = %Default{a: "1", b: "2"}
-    assert ["a,b\r\n", "1,2\r\n"] = dump default
+  test "should write extra columns if extra_columns is ':retain'" do
+    default = Map.put(%Retain{a: "1", b: "2"}, :c, "3")
+    assert ["a,b,c\r\n", "1,2,3\r\n"] = dump default
   end
 
   defp dump(lines) do

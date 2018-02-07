@@ -27,14 +27,14 @@ defmodule EctoCSV.Dumper do
 
   defp row_values(struct, index, schema) do
     if index == 0 && file_has_header?(schema) do
-      [headers(schema), row_values(struct, schema)]
+      [headers(struct, schema), row_values(struct, schema)]
     else
       [row_values(struct, schema)]
     end
   end
 
   defp row_values(struct, schema) do
-    Enum.map(headers(schema), &struct_value(struct, &1))
+    Enum.map(headers(struct, schema), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do
@@ -46,6 +46,19 @@ defmodule EctoCSV.Dumper do
       separator: separator(schema),
       delimiter: delimiter(schema)
     ]
+  end
+
+  defp headers(struct, schema) do
+    if extra_columns(schema) == :retain do
+      extra_headers = (keys(struct) |> reject_meta_keys) -- headers(schema)
+      headers(schema) ++ extra_headers  
+    else # ignore extras
+      headers(schema)
+    end
+  end
+
+  defp keys(struct) do
+    Map.keys(struct)
   end
 
   defp schema(struct) do
@@ -60,12 +73,21 @@ defmodule EctoCSV.Dumper do
     schema.__csv__ :headers
   end
 
+  defp extra_columns(schema) do
+    schema.__csv__ :extra_columns
+  end
+
+
   defp separator(schema) do
     schema.__csv__ :separator
   end
 
   defp delimiter(schema) do
     schema.__csv__ :delimiter
+  end
+
+  defp reject_meta_keys keys do
+    Enum.reject keys, &meta_key?(&1)
   end
 
   defp meta_key?(:id),                     do: true
