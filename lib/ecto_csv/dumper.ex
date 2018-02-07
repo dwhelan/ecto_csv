@@ -18,7 +18,9 @@ defmodule EctoCSV.Dumper do
   end
 
   defp to_values(stream, schema) do
-    Stream.transform(stream, 0, fn struct, index -> {row_values(struct, index, schema), index + 1} end )
+    Stream.transform(stream, 0, fn struct, index -> 
+      {row_values(struct, index, schema), index + 1}
+    end)
   end
 
   defp write(stream, schema) do
@@ -26,15 +28,19 @@ defmodule EctoCSV.Dumper do
   end
 
   defp row_values(struct, index, schema) do
-    if index == 0 && file_has_header?(schema) do
-      [headers(struct, schema), row_values(struct, schema)]
-    else
-      [row_values(struct, schema)]
-    end
+    row_values(struct, index, schema, file_has_header?(schema))
+  end
+
+  defp row_values(struct, 0, schema, true) do
+    [keys(struct, schema), row_values(struct, schema)]
+  end
+
+  defp row_values(struct, _, schema, _) do
+    [row_values(struct, schema)]
   end
 
   defp row_values(struct, schema) do
-    Enum.map(headers(struct, schema), &struct_value(struct, &1))
+    Enum.map(keys(struct, schema), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do
@@ -48,17 +54,16 @@ defmodule EctoCSV.Dumper do
     ]
   end
 
-  defp headers(struct, schema) do
-    if extra_columns(schema) == :retain do
-      extra_headers = (keys(struct) |> reject_meta_keys) -- headers(schema)
-      headers(schema) ++ extra_headers  
-    else # ignore extras
-      headers(schema)
-    end
+  defp keys(struct, schema) do
+    keys(struct, headers(schema), extra_columns(schema))
   end
 
-  defp keys(struct) do
-    Map.keys(struct)
+  defp keys(struct, schema_headers, :retain) do
+    schema_headers ++ (Map.keys(struct) |> reject_meta_keys) -- schema_headers
+  end
+
+  defp keys(_struct, schema_headers, _) do
+    schema_headers
   end
 
   defp schema(struct) do
@@ -89,7 +94,6 @@ defmodule EctoCSV.Dumper do
     Enum.reject keys, &meta_key?(&1)
   end
 
-  defp meta_key?(:id),                     do: true
-  defp meta_key?(key) when is_atom(key),   do: meta_key? Atom.to_string(key)
-  defp meta_key?(key) when is_binary(key), do: Regex.match? ~r/^__/, key
+  defp meta_key?(key) when is_atom(key),   do: key == :id or meta_key? Atom.to_string(key)
+  defp meta_key?(key),                     do: Regex.match? ~r/^__/, key
 end
