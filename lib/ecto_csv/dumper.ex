@@ -7,50 +7,38 @@ defmodule EctoCSV.Dumper do
 
   def dump(stream) do
     schema = extract_schema(stream)
+
     stream
-    |> to_values
+    |> to_values(schema)
     |> write(schema)
   end
 
-  defp to_values(stream) do
-    Stream.transform(stream, 0, fn struct, index -> {row_values(struct, index), index + 1} end )
+  defp extract_schema(stream) do
+    Enum.take(stream , 1) |> List.first |> schema
   end
 
-  defp extract_schema(stream) do
-    struct = hd(Enum.take(stream , 1))
-    struct.__struct__
-  end  
+  defp to_values(stream, schema) do
+    Stream.transform(stream, 0, fn struct, index -> {row_values(struct, index, schema), index + 1} end )
+  end
 
   defp write(stream, schema) do
     CSV.write(stream, options(schema))
   end
 
-  defp row_values(struct, index) do
-    schema = struct.__struct__
-
-    if index == 0 && schema.__csv__(:file_has_header?) do
-      [schema.__csv__(:headers), row_values(struct)]
+  defp row_values(struct, index, schema) do
+    if index == 0 && file_has_header?(schema) do
+      [headers(schema), row_values(struct, schema)]
     else
-      [row_values(struct)]
+      [row_values(struct, schema)]
     end
   end
 
-  defp row_values(struct) do
-    schema = struct.__struct__
-    Enum.map(schema.__csv__(:headers) |> reject_meta_keys, &struct_value(struct, &1))
-  end
-
-  defp row_values2(struct) do
-    schema = struct.__struct__
-    Enum.map(schema.__csv__(:headers), &struct_value(struct, &1))
+  defp row_values(struct, schema) do
+    Enum.map(headers(schema), &struct_value(struct, &1))
   end
 
   defp struct_value(struct, field) do
     Map.get(struct, field) || ""
-  end
-
-  defp reject_meta_keys keys do
-    Enum.reject keys, &meta_key?(&1)
   end
 
   defp options(schema) do
@@ -58,6 +46,18 @@ defmodule EctoCSV.Dumper do
       separator: separator(schema),
       delimiter: delimiter(schema)
     ]
+  end
+
+  defp schema(struct) do
+    struct.__struct__
+  end
+
+  defp file_has_header?(schema) do
+    schema.__csv__ :file_has_header?
+  end
+
+  defp headers(schema) do
+    schema.__csv__ :headers
   end
 
   defp separator(schema) do
