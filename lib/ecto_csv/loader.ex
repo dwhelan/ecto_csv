@@ -21,7 +21,6 @@ defmodule EctoCSV.Loader do
 
   @doc """
   Load CSV data from the `stream` returning a stream of structs as defined by the `schema`.
-
   """
   def load(stream, schema) do
     {stream, headers} = extract_headers(stream, schema)
@@ -47,6 +46,8 @@ defmodule EctoCSV.Loader do
     CSV.read(stream, options(schema))
   end
 
+
+  #Extracts separator and delimiter from the schema
   @spec options(EctoCSV.Schema) :: Keyword.t
   defp options(schema) do
     [

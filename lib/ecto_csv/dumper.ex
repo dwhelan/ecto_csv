@@ -1,11 +1,24 @@
 defmodule EctoCSV.Dumper do
   alias EctoCSV.Adapters.CSV
 
+  @moduledoc """
+  Exports data to a file using an 'Ecto.Schema' to describe the data.
+  """
+
+  @doc """
+  Writes stream of data to a file named 'path' and returns the file once 
+  written.
+  """
   @spec dump(Stream.t, binary) :: Collectable.t
   def dump(stream, path) do
     dump(stream) |> Enum.into(File.stream!(path))
   end
 
+  @doc """
+  Extracts schema and formats the stream of information 
+  using the delimiters and separators specified in the
+  schema.
+  """
   @spec dump(Stream.t) :: Stream.t
   def dump(stream) do
     schema = extract_schema(stream)
