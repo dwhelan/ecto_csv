@@ -14,6 +14,7 @@ defmodule EctoCSV.Loader do
   @doc """
   Load CSV data from the file at `path` returning a stream of structs as defined by the `schema`.
   """
+  @spec load(String | Stream.t, EctoCSV.Schema) :: Stream.t
   def load(path, schema) when is_binary(path) do
     load(File.stream!(path), schema)
   end
@@ -32,6 +33,7 @@ defmodule EctoCSV.Loader do
     |> load_row(schema)
   end
 
+  @spec extract_headers(Stream.t, EctoCSV.Schema) :: Stream.t
   defp extract_headers(stream, schema) do
     if file_has_header?(schema) do
       {Header.remove_header(stream), Header.file_headers(stream, schema)}
@@ -40,10 +42,12 @@ defmodule EctoCSV.Loader do
     end
   end
 
+  @spec read(Stream.t, EctoCSV.Schema) :: Stream.t
   defp read(stream, schema) do
     CSV.read(stream, options(schema))
   end
 
+  @spec options(EctoCSV.Schema) :: Keyword.t
   defp options(schema) do
     [
       separator: separator(schema),
@@ -51,6 +55,7 @@ defmodule EctoCSV.Loader do
     ]
   end
 
+  @spec validate_row(Stream.t, [atom], EctoCSV.Schema) :: any
   defp validate_row(stream, headers, schema) do
     line_offset = case file_has_header?(schema) do
       true  -> 2
@@ -68,6 +73,7 @@ defmodule EctoCSV.Loader do
     end)
   end
 
+  @spec create_key_value_tuples(Stream.t, [atom], EctoCSV.Schema) :: Stream.t
   defp create_key_value_tuples(stream, headers, schema) do
     Stream.map(stream, fn values ->
       values = maybe_remove_extra_values(values, headers, extra_columns(schema))
@@ -106,6 +112,7 @@ defmodule EctoCSV.Loader do
     headers ++ extra_headers
   end
 
+  @spec load_row(Stream.t, EctoCSV.Schema) :: Stream.t
   defp load_row(stream, schema) do
     Stream.map(stream, fn tuples -> 
       tuples |> Enum.reduce(struct(schema), &load_value(&1, &2, schema))
@@ -121,30 +128,37 @@ defmodule EctoCSV.Loader do
     end
   end
 
+  @spec file_has_header?(EctoCSV.Schema) :: boolean
   defp file_has_header?(schema) do
     schema.__csv__ :file_has_header?
   end
 
+  @spec headers(EctoCSV.Schema) :: [atom]
   defp headers(schema) do
     schema.__csv__ :headers
   end
 
+  @spec extra_columns(EctoCSV.Schema) :: atom
   defp extra_columns(schema) do
     schema.__csv__ :extra_columns
   end
 
+  @spec type(EctoCSV.Schema, atom) :: atom
   defp type(schema, field) do
     schema.__schema__(:type, field) || :string
   end
 
+  @spec separator(EctoCSV.Schema) :: String
   defp separator(schema) do
     schema.__csv__ :separator
   end
 
+  @spec delimiter(EctoCSV.Schema) :: String
   defp delimiter(schema) do
     schema.__csv__ :delimiter
   end
 
+  @spec to_atom(any) :: [atom] | atom
   defp to_atom(list) when is_list(list) do
     list |> Enum.map(&to_atom(&1))
   end
