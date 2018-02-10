@@ -2,6 +2,7 @@ defmodule EctoCSV.Loader.Header do
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
 
+  @spec remove_header(Stream.t) :: Stream.t
   def remove_header(stream) do
     Stream.transform(stream, 0, fn struct, index -> 
       case index do
@@ -11,6 +12,7 @@ defmodule EctoCSV.Loader.Header do
     end)
   end
 
+  @spec file_headers(Stream.t, EctoCSV.Schema) :: [atom] | no_return()
   def file_headers(stream, schema) do
     stream
     |> read(schema)
@@ -18,10 +20,12 @@ defmodule EctoCSV.Loader.Header do
     |> ensure_valid_headers(schema)
   end
 
+  @spec read(Stream.t, EctoCSV.Schema) :: Stream.t
   defp read(stream, schema) do
     CSV.read(stream, options(schema))
   end
 
+  @spec options(EctoCSV.Schema) :: Keyword.t
   defp options(schema) do
     [
       separator: separator(schema),
@@ -29,10 +33,12 @@ defmodule EctoCSV.Loader.Header do
     ]
   end
 
+  @spec take_header(Stream.t) :: [atom]
   defp take_header(stream) do
     stream |> Enum.take(1) |> List.first |> to_atom
   end
 
+  @spec ensure_valid_headers([atom], EctoCSV.Schema) :: [atom] | no_return()
   defp ensure_valid_headers(headers, schema) do    
     if Enum.filter(headers, &(String.length(Atom.to_string(&1)) == 0)) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
@@ -56,26 +62,32 @@ defmodule EctoCSV.Loader.Header do
     headers
   end
 
+  @spec headers(EctoCSV.Schema) :: [atom]
   defp headers(schema) do
     schema.__csv__ :headers
   end
 
+  @spec extra_columns(EctoCSV.Schema) :: atom
   defp extra_columns(schema) do
     schema.__csv__ :extra_columns
   end
 
+  @spec separator(EctoCSV.Schema) :: String
   defp separator(schema) do
     schema.__csv__ :separator
   end
 
+  @spec delimiter(EctoCSV.Schema) :: String
   defp delimiter(schema) do
     schema.__csv__ :delimiter
   end
 
+  @spec to_atom([String]) :: [atom] 
   defp to_atom(list) when is_list(list) do
     list |> Enum.map(&to_atom(&1))
   end
 
+  @spec to_atom(String) :: atom
   defp to_atom(string) when is_binary(string) do
     try do
       String.to_existing_atom(string)
