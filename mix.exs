@@ -26,7 +26,7 @@ defmodule EctoCSV.Mixfile do
       {:ecto,            "~> 2.1"},
       {:mix_test_watch,  "~> 0.5", only: :dev},
       {:nimble_csv,      "~> 0.3"},
-      {:excoveralls, "~> 0.8", only: :test},
+      {:excoveralls,     "~> 0.8", only: :test},
     ]
   end
 end
