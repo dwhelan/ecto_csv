@@ -1,5 +1,4 @@
 # EctoCSV things to do
-* handle header row with blank cells (allow code to specify name or field number)
 * handle utf8 with / without BOM - perhaps CSV do format :utf8, :utf8_bom
 * provide option to remove trailing separator - test with comma, |, \t 
 
