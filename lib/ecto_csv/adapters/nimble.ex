@@ -13,16 +13,19 @@ defmodule EctoCSV.Adapters.Nimble do
   NimbleCSV.define(PipeLF,    separator: "|",  line_separator: "\n")
   NimbleCSV.define(PipeCRLF,  separator: "|",  line_separator: "\r\n")
 
-  def read(stream, options \\ [separator: ",", line_separator: "\r\n"]) do
+  @default_options separator: ",", delimiter: "\r\n"
+
+  def read(stream, options \\ []) do
     nimble_for(options).parse_stream(stream, headers: false)
   end
 
-  def write(stream, options) do
+  def write(stream, options \\ []) do
     nimble_for(options).dump_to_stream(stream) |> Stream.map(&IO.iodata_to_binary(&1))
   end
 
   defp nimble_for(options) do
-    case {options[:separator] || ",", options[:delimiter] || "\r\n"} do
+    options = Keyword.merge(@default_options, options)
+    case {options[:separator], options[:delimiter]} do
       {",",  "\n"}   -> CommaLF
       {",",  "\r\n"} -> CommaCRLF
       {"\t", "\n"}   -> TabLF

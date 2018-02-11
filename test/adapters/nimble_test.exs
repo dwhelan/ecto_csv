@@ -74,4 +74,9 @@ defmodule EctoCSV.Adapters.NimbleTest do
     lines = CSV.write([["a", "b"], ["1", "2"]], delimiter: "\r\n") |> Enum.to_list
     assert lines == ["a,b\r\n", "1,2\r\n"]
   end
+
+  test "that write should allow all default options" do
+    lines = CSV.write([["a", "b"], ["1", "2"]]) |> Enum.to_list
+    assert lines == ["a,b\r\n", "1,2\r\n"]
+  end
 end
