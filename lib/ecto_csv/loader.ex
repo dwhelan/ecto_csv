@@ -5,6 +5,7 @@ defmodule EctoCSV.Loader do
   alias EctoCSV.LoadError
   alias EctoCSV.Loader.Header
   import EctoCSV.Atom
+  import EctoCSV.SchemaHelper
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -46,7 +47,6 @@ defmodule EctoCSV.Loader do
   defp read(stream, schema) do
     CSV.read(stream, options(schema))
   end
-
 
   #Extracts separator and delimiter from the schema
   @spec options(EctoCSV.Schema) :: Keyword.t
@@ -120,35 +120,5 @@ defmodule EctoCSV.Loader do
     else
       struct
     end
-  end
-
-  @spec file_has_header?(EctoCSV.Schema) :: boolean
-  defp file_has_header?(schema) do
-    schema.__csv__ :file_has_header?
-  end
-
-  @spec headers(EctoCSV.Schema) :: [atom]
-  defp headers(schema) do
-    schema.__csv__ :headers
-  end
-
-  @spec extra_columns(EctoCSV.Schema) :: atom
-  defp extra_columns(schema) do
-    schema.__csv__ :extra_columns
-  end
-
-  @spec type(EctoCSV.Schema, atom) :: atom
-  defp type(schema, field) do
-    schema.__schema__(:type, field) || :string
-  end
-
-  @spec separator(EctoCSV.Schema) :: String
-  defp separator(schema) do
-    schema.__csv__ :separator
-  end
-
-  @spec delimiter(EctoCSV.Schema) :: String
-  defp delimiter(schema) do
-    schema.__csv__ :delimiter
   end
 end

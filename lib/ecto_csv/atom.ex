@@ -1,4 +1,6 @@
 defmodule EctoCSV.Atom do
+  @doc false
+
   @spec to_atom([String | atom]) :: [atom] 
   def to_atom(list) when is_list(list) do
     Enum.map(list, &to_atom(&1))

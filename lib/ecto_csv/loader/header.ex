@@ -2,6 +2,7 @@ defmodule EctoCSV.Loader.Header do
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
   import EctoCSV.Atom
+  import EctoCSV.SchemaHelper
 
   @spec remove_header(Stream.t) :: Stream.t
   def remove_header(stream) do
@@ -61,25 +62,5 @@ defmodule EctoCSV.Loader.Header do
     end
 
     headers
-  end
-
-  @spec headers(EctoCSV.Schema) :: [atom]
-  defp headers(schema) do
-    schema.__csv__ :headers
-  end
-
-  @spec extra_columns(EctoCSV.Schema) :: atom
-  defp extra_columns(schema) do
-    schema.__csv__ :extra_columns
-  end
-
-  @spec separator(EctoCSV.Schema) :: String
-  defp separator(schema) do
-    schema.__csv__ :separator
-  end
-
-  @spec delimiter(EctoCSV.Schema) :: String
-  defp delimiter(schema) do
-    schema.__csv__ :delimiter
   end
 end

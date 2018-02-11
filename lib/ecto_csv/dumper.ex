@@ -1,5 +1,6 @@
 defmodule EctoCSV.Dumper do
   alias EctoCSV.Adapters.CSV
+  import EctoCSV.SchemaHelper
 
   @moduledoc """
   Exports data to a file using an 'Ecto.Schema' to describe the data.
@@ -91,31 +92,6 @@ defmodule EctoCSV.Dumper do
 
   defp schema(struct) do
     struct.__struct__
-  end
-
-  @spec file_has_header?(EctoCSV.Schema) :: boolean
-  defp file_has_header?(schema) do
-    schema.__csv__ :file_has_header?
-  end
-
-  @spec headers(EctoCSV.Schema) :: [atom]
-  defp headers(schema) do
-    schema.__csv__ :headers
-  end
-
-  @spec extra_columns(EctoCSV.Schema) :: atom
-  defp extra_columns(schema) do
-    schema.__csv__ :extra_columns
-  end
-
-  @spec separator(EctoCSV.Schema) :: String.t
-  defp separator(schema) do
-    schema.__csv__ :separator
-  end
-
-  @spec delimiter(EctoCSV.Schema) :: String.t
-  defp delimiter(schema) do
-    schema.__csv__ :delimiter
   end
 
   defp reject_meta_keys keys do
