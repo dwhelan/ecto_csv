@@ -1,25 +1,34 @@
 defmodule EctoCSV.Adapters.Nimble do
-  NimbleCSV.define(EctoCSV.Adapters.Nimble.CommaSeparator, separator: ",",  escape: "\"")
-  NimbleCSV.define(EctoCSV.Adapters.Nimble.PipeSeparator,  separator: "|",  escape: "\"")
-  NimbleCSV.define(EctoCSV.Adapters.Nimble.TabSeparator,   separator: "\t", escape: "\"")
+  alias EctoCSV.Adapters.Nimble.CommaLF 
+  alias EctoCSV.Adapters.Nimble.CommaCRLF 
+  alias EctoCSV.Adapters.Nimble.TabLF
+  alias EctoCSV.Adapters.Nimble.TabCRLF
+  alias EctoCSV.Adapters.Nimble.PipeLF
+  alias EctoCSV.Adapters.Nimble.PipeCRLF
 
-  alias EctoCSV.Adapters.Nimble.CommaSeparator 
-  alias EctoCSV.Adapters.Nimble.PipeSeparator
-  alias EctoCSV.Adapters.Nimble.TabSeparator
+  NimbleCSV.define(CommaLF,   separator: ",",  line_separator: "\n")
+  NimbleCSV.define(CommaCRLF, separator: ",",  line_separator: "\r\n")
+  NimbleCSV.define(TabLF,     separator: "\t", line_separator: "\n")
+  NimbleCSV.define(TabCRLF,   separator: "\t", line_separator: "\r\n")
+  NimbleCSV.define(PipeLF,    separator: "|",  line_separator: "\n")
+  NimbleCSV.define(PipeCRLF,  separator: "|",  line_separator: "\r\n")
 
-  def read(stream, options) do
+  def read(stream, options \\ [separator: ",", line_separator: "\r\n"]) do
     nimble_for(options).parse_stream(stream, headers: false)
   end
 
   def write(stream, options) do
-    nimble_for(options).dump_to_stream(stream)
+    nimble_for(options).dump_to_stream(stream) |> Stream.map(&IO.iodata_to_binary(&1))
   end
 
   defp nimble_for(options) do
-    case options[:separator] do
-      ","  -> CommaSeparator
-      "|"  -> PipeSeparator
-      "\t" -> TabSeparator
+    case {options[:separator] || ",", options[:delimiter] || "\r\n"} do
+      {",",  "\n"}   -> CommaLF
+      {",",  "\r\n"} -> CommaCRLF
+      {"\t", "\n"}   -> TabLF
+      {"\t", "\r\n"} -> TabCRLF
+      {"|",  "\n"}   -> PipeLF
+      {"|",  "\r\n"} -> PipeCRLF
     end
   end
 end
