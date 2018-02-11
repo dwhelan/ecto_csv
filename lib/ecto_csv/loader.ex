@@ -4,6 +4,7 @@ defmodule EctoCSV.Loader do
   require EctoCSV.Adapters.Nimble, as: CSV
   alias EctoCSV.LoadError
   alias EctoCSV.Loader.Header
+  import EctoCSV.Atom
 
   @moduledoc """
   Loads CSV data using an `Ecto.Schema` to describe the data.
@@ -85,7 +86,7 @@ defmodule EctoCSV.Loader do
   end
 
   defp maybe_remove_extra_values(values, headers, :ignore) do
-    remove_extra_values(headers, values)
+    Enum.take values, length(headers)
   end
 
   defp maybe_remove_extra_values(values, _, _) do
@@ -98,14 +99,6 @@ defmodule EctoCSV.Loader do
 
   defp maybe_add_extra_keys(values, headers, _) do
     create_headers_with_extras(headers, values)
-  end
-
-  defp remove_extra_values([], values) do
-    values
-  end
-
-  defp remove_extra_values(headers, values) do
-    Enum.take values, length(headers)
   end
 
   defp create_headers_with_extras(headers, values) do
@@ -157,18 +150,5 @@ defmodule EctoCSV.Loader do
   @spec delimiter(EctoCSV.Schema) :: String
   defp delimiter(schema) do
     schema.__csv__ :delimiter
-  end
-
-  @spec to_atom(any) :: [atom] | atom
-  defp to_atom(list) when is_list(list) do
-    list |> Enum.map(&to_atom(&1))
-  end
-
-  defp to_atom(string) when is_binary(string) do
-    try do
-      String.to_existing_atom(string)
-    rescue ArgumentError -> 
-      String.to_atom(string)
-    end
   end
 end

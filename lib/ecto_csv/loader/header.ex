@@ -1,6 +1,7 @@
 defmodule EctoCSV.Loader.Header do
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
+  import EctoCSV.Atom
 
   @spec remove_header(Stream.t) :: Stream.t
   def remove_header(stream) do
@@ -80,19 +81,5 @@ defmodule EctoCSV.Loader.Header do
   @spec delimiter(EctoCSV.Schema) :: String
   defp delimiter(schema) do
     schema.__csv__ :delimiter
-  end
-
-  @spec to_atom([String]) :: [atom] 
-  defp to_atom(list) when is_list(list) do
-    list |> Enum.map(&to_atom(&1))
-  end
-
-  @spec to_atom(String) :: atom
-  defp to_atom(string) when is_binary(string) do
-    try do
-      String.to_existing_atom(string)
-    rescue ArgumentError -> 
-      String.to_atom(string)
-    end
   end
 end

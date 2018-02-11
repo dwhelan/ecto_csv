@@ -1,5 +1,6 @@
 {
   "skip_files": [
-    "deps/"
+    "deps/",
+    "lib/ecto_csv.ex",
   ]
 }
