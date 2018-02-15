@@ -1,4 +1,5 @@
 defmodule EctoCSV.Atom do
+  @moduledoc false
   @doc false
 
   @spec to_atom([String | atom]) :: [atom] 

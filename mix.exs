@@ -22,6 +22,7 @@ defmodule EctoCSV.Mixfile do
   defp deps do
     [
       {:briefly,         "~> 0.3", only: :test},
+      {:credo,           "~> 0.9.0-rc3", only: [:dev, :test], runtime: false},
       {:csv,             "~> 2.0"},
       {:ecto,            "~> 2.1"},
       {:mix_test_watch,  "~> 0.5", only: :dev},

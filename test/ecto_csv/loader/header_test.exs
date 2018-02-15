@@ -81,6 +81,6 @@ defmodule EctoCSV.Loader.HeaderTest do
   end
 
   defp load(path, schema) do
-    hd(EctoCSV.Loader.load(path, schema) |> Enum.take(1))
+    path |> EctoCSV.Loader.load(schema) |> Enum.take(1) |> List.first
   end
 end

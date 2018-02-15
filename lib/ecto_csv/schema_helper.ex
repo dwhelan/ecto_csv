@@ -1,6 +1,7 @@
 defmodule EctoCSV.SchemaHelper do
   alias EctoCSV.Schema
 
+  @moduledoc false
   @doc false
 
   @spec type(Schema, atom) :: atom

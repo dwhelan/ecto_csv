@@ -4,14 +4,11 @@ defmodule EctoCSV.Adapters.CSV do
   @default_options separator: ",", delimiter: "\r\n"
 
   @moduledoc """
-  Read and writes data streams according to the options provided. These
-  options may include custom separators and delimiters.
+  Read and writes data streams using the CSV package.
   """
 
   @doc """
-  Reads an input stream of strings and maps each string to a list of values.
-  Input strings are split using the separator specified in options defaulting to a comma separator.
-  Returns a stream of lists of strings.
+  Takes an input stream of strings and returns a stream of lists of values.
   """
   @spec read(Stream.t, Keyword.t) :: Stream.t
   def read(stream, options \\ []) do
@@ -19,8 +16,7 @@ defmodule EctoCSV.Adapters.CSV do
   end
 
   @doc """
-  Assembles the row of data and separates them using the 'separator' option 
-  provided by the schema. Returns a stream containing the formatted data.
+  Takes an output stream of list of values and returns a stream of strings.
   """
   @spec write(Stream.t, Keyword.t) :: Stream.t
   def write(stream, options \\ []) do
@@ -29,7 +25,13 @@ defmodule EctoCSV.Adapters.CSV do
 
   @spec adaptor(Keyword.t) :: Keyword.t
   defp adaptor(options) do
-    options = Keyword.merge(@default_options, options )
-    Keyword.update!(options, :separator, &String.to_charlist(&1) |> List.first)
+    @default_options
+    |> Keyword.merge(options)
+    |> Keyword.update!(:separator, &first_char(&1))
+  end
+
+  @spec adaptor(String.t) :: Char.t
+  defp first_char(string) do
+    string |> String.to_charlist |> List.first
   end
 end

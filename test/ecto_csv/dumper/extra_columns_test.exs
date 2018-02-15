@@ -53,6 +53,6 @@ defmodule EctoCSV.Dumper.ExtraColumnsTest do
   end
 
   defp dump(lines) do
-    EctoCSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
+    lines |> List.wrap |> EctoCSV.Dumper.dump |> Enum.to_list
   end
 end

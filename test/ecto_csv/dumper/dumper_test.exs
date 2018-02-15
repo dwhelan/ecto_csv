@@ -32,13 +32,13 @@ defmodule EctoCSV.Dumper.DumperTest do
     end
 
     test "that records can be dumped to files" do
-      path = TestFile.create();
+      path = TestFile.create()
       EctoCSV.Dumper.dump([%Example{a: "hi", b: 2, c: 3.4}, %Example{a: "there", b: 5, c: 6.7}], path)
       assert {:ok, "a,b,c\r\nhi,2,3.4\r\nthere,5,6.7\r\n"} = File.read(path)
     end
   end
 
   defp dump(lines) do
-    EctoCSV.Dumper.dump(List.wrap(lines)) |> Enum.to_list
+    lines |> List.wrap |> EctoCSV.Dumper.dump |> Enum.to_list
   end
 end

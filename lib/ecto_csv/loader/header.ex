@@ -1,4 +1,5 @@
 defmodule EctoCSV.Loader.Header do
+  @moduledoc false
   alias EctoCSV.Adapters.CSV
   alias EctoCSV.LoadError
   import EctoCSV.Atom
@@ -42,17 +43,19 @@ defmodule EctoCSV.Loader.Header do
 
   @spec ensure_valid_headers([atom], EctoCSV.Schema) :: [atom] | no_return()
   defp ensure_valid_headers(headers, schema) do    
-    if Enum.filter(headers, &(String.length(Atom.to_string(&1)) == 0)) |> length > 0 do
+    if headers |> Enum.filter(& blank? &1) |> length > 0 do
       raise LoadError.exception(line: 1, message: "blank header found")
     end
 
-    if length(missing = headers(schema) -- headers) > 0 do
+    missing = headers(schema) -- headers
+    if length(missing) > 0 do
       missing = Enum.join(missing, ",")
       raise LoadError.exception(line: 1, message: "missing headers '#{missing}'")
     end
 
-    if length(duplicates = headers -- Enum.uniq(headers)) > 0 do
-      duplicates = Enum.uniq(duplicates) |> Enum.join(",")
+    duplicates = headers -- Enum.uniq(headers)
+    if length(duplicates) > 0 do
+      duplicates = duplicates |> Enum.uniq |> Enum.join(",")
       raise LoadError.exception(line: 1, message: "duplicate headers '#{duplicates}' found")
     end
 
@@ -62,5 +65,10 @@ defmodule EctoCSV.Loader.Header do
     end
 
     headers
+  end
+
+  @spec blank?(atom) :: boolean
+  defp blank?(atom) do
+    String.length(Atom.to_string(atom)) == 0
   end
 end

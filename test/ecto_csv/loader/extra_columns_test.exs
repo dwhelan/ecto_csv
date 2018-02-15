@@ -116,10 +116,10 @@ defmodule EctoCSV.Loader.ExtraColumnsTest do
   end
 
   defp load(lines, schema) do
-    EctoCSV.Loader.load(lines, schema) |> Enum.take(1) |> List.first
+    lines |> EctoCSV.Loader.load(schema) |> Enum.take(1) |> List.first
   end
 
   defp load_all(lines, schema) do
-    EctoCSV.Loader.load(lines, schema) |> Enum.to_list
+    lines |> EctoCSV.Loader.load(schema) |> Enum.to_list
   end
 end

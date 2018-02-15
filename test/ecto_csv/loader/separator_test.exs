@@ -69,6 +69,6 @@ defmodule EctoCSV.Loader.SeparatorTest do
   end
 
   defp load(stream, schema) do
-    hd(EctoCSV.Loader.load(stream, schema) |> Enum.take(1))
+    stream |> EctoCSV.Loader.load(schema) |> Enum.take(1) |> List.first
   end
 end

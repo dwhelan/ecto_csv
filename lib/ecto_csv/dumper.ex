@@ -12,7 +12,7 @@ defmodule EctoCSV.Dumper do
   """
   @spec dump(Stream.t, binary) :: Collectable.t
   def dump(stream, path) do
-    dump(stream) |> Enum.into(File.stream!(path))
+    stream |> dump |> Enum.into(File.stream!(path))
   end
 
   @doc """
@@ -31,7 +31,7 @@ defmodule EctoCSV.Dumper do
 
   @spec extract_schema(Stream.t) :: EctoCSV.Schema
   defp extract_schema(stream) do
-    Enum.take(stream , 1) |> List.first |> schema
+    stream |> Enum.take(1) |> List.first |> schema
   end
 
   @spec to_values(Stream.t, EctoCSV.Schema) :: Stream.t
@@ -83,7 +83,7 @@ defmodule EctoCSV.Dumper do
   end
 
   defp keys(struct, schema_headers, :retain) do
-    schema_headers ++ (Map.keys(struct) |> reject_meta_keys) -- schema_headers
+    schema_headers ++ (struct |> Map.keys |> reject_meta_keys) -- schema_headers
   end
 
   defp keys(_struct, schema_headers, _) do

@@ -43,6 +43,6 @@ defmodule EctoCSV.Loader.ExtraColumnsWithoutHeadersTest do
   end
 
   defp load(lines, schema) do
-    EctoCSV.Loader.load(lines, schema) |> Enum.take(1) |> List.first
+    lines |> EctoCSV.Loader.load(schema) |> Enum.take(1) |> List.first
   end
 end

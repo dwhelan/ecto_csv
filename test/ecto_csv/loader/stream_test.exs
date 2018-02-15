@@ -46,6 +46,6 @@ defmodule EctoCSV.Loader.StreamTest do
   end
 
   defp load(lines) do
-    EctoCSV.Loader.load(lines, Example) |> Enum.to_list
+    lines |> EctoCSV.Loader.load(Example) |> Enum.to_list
   end
 end

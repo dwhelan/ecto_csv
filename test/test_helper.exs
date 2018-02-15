@@ -1,7 +1,7 @@
 ExUnit.start(
-  exclude: [:wip, :skip], include: [],
+  exclude: [:wip, :skip], include: []
   # Uncomment the line below to enable focus mode
-  # exclude: [:test], include: [:focus]
+  # , exclude: [:test], include: [:focus]
 )
 
 defmodule TestFile do 

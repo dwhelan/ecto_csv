@@ -1,4 +1,8 @@
 defmodule EctoCSV.Adapters.Nimble do
+  @moduledoc """
+  Read and writes data streams using the `NimbleCSV` package.
+  """
+
   alias EctoCSV.Adapters.Nimble.CommaLF 
   alias EctoCSV.Adapters.Nimble.CommaCRLF 
   alias EctoCSV.Adapters.Nimble.TabLF
@@ -15,12 +19,20 @@ defmodule EctoCSV.Adapters.Nimble do
 
   @default_options separator: ",", delimiter: "\r\n"
 
+  @doc """
+  Takes an input stream of strings and returns a stream of lists of values.
+  """
   def read(stream, options \\ []) do
-    nimble_for(options).parse_stream(stream, headers: false)
+    csv = nimble_for(options)
+    stream |> csv.parse_stream(headers: false)
   end
 
+  @doc """
+  Takes an output stream of list of values and returns a stream of strings.
+  """
   def write(stream, options \\ []) do
-    nimble_for(options).dump_to_stream(stream) |> Stream.map(&IO.iodata_to_binary(&1))
+    csv = nimble_for(options)
+    stream |> csv.dump_to_stream |> Stream.map(&IO.iodata_to_binary(&1))
   end
 
   defp nimble_for(options) do
